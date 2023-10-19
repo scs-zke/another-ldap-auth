@@ -1,8 +1,9 @@
 name: Scan Docker image
 
 on:
-  schedule:
-    - cron: "00 03 * * *"
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "00 03 * * *"
 
 jobs:
   build:
