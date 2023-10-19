@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 from flask import request
 
 class Security:
