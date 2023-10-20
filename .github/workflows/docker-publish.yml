@@ -7,9 +7,9 @@ on:
       - master
     tags:
       - "v*"
-  release:
-    types:
-      - published
+  # release:
+  #   types:
+  #     - published
 
 env:
   # GitHub Container Registry
