@@ -1,6 +1,6 @@
 # Another LDAP authentication
 
-⚠️ This version of Another LDAP Auth is forked from <https://github.com/dignajar/another-ldap-auth>
+⚠️ This version of _Another LDAP Auth_ is forked from <https://github.com/dignajar/another-ldap-auth>
 
 **LDAP Authentication** for **Nginx**, **Nginx ingress controller** (Kubernetes), **HAProxy** ([haproxy-auth-request](https://github.com/TimWolla/haproxy-auth-request)) or any webserver/reverse proxy with authorization based on the result of a subrequest.
 
@@ -8,11 +8,11 @@
 
 **Another LDAP Authentication** it's prepared to run inside a Docker container, also you can run the Python script without the Docker container.
 
-[![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue.svg)](https://hub.docker.com/r/dignajar/another-ldap-auth)
-[![Kubernetes YAML manifests](https://img.shields.io/badge/Kubernetes-manifests-blue.svg)](https://github.com/dignajar/another-ldap-auth/tree/master/kubernetes)
-[![codebeat badge](https://codebeat.co/badges/1d7cc634-4af0-4f26-b910-99fc98c61d11)](https://codebeat.co/projects/github-com-dignajar-another-ldap-auth-master)
-[![release](https://img.shields.io/github/v/release/dignajar/another-ldap-auth.svg)](https://github.com/dignajar/another-ldap-auth/releases)
-[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/dignajar/another-ldap-auth/blob/master/LICENSE)
+[![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue.svg)](https://hub.docker.com/r/jgkirschbaum/another-ldap-auth)
+[![Kubernetes YAML manifests](https://img.shields.io/badge/Kubernetes-manifests-blue.svg)](https://github.com/jgkirschbaum/another-ldap-auth/tree/master/kubernetes)
+[![codebeat badge](https://codebeat.co/badges/fefb2c70-878f-4f34-bbb7-cfbc8071bb03)](https://codebeat.co/projects/github-com-jgkirschbaum-another-ldap-auth-master)
+[![release](https://img.shields.io/github/v/release/jgkirschbaum/another-ldap-auth.svg)](https://github.com/jgkirschbaum/another-ldap-auth/releases)
+[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/jgkirschbaum/another-ldap-auth/blob/master/LICENSE)
 
 ## Features
 
@@ -27,7 +27,7 @@
 
 ## Diagram
 
-![Another LDAP Authentication](https://i.ibb.co/crJ0Xr2/diagram-1.png)
+![Another LDAP Authentication](https://camo.githubusercontent.com/170994cb57d0fa3f85999421c652bf5fd64342fa0cd6cea65fb7904ed4062061/68747470733a2f2f63646e2d312e77702e6e67696e782e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031362f30322f6c6461702d617574682d636f6d706f6e656e74732e6a7067)
 
 ## Available configurations parameters
 
@@ -101,7 +101,7 @@ docker run -d \
     -e LOG_FORMAT='JSON' \
     -p 9000:9000 \
     --name another_ldap_auth \
-    dignajar/another-ldap-auth:latest
+    jgkirschbaum/another-ldap-auth:latest
 ```
 
 **Another LDAP Authentication** now is running on `http://localhost:9000`.
