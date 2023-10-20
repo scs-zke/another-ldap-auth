@@ -3,11 +3,16 @@ name: Scan Docker image
 on:
   workflow_dispatch:
   schedule:
-    - cron: "00 03 * * *"
+    - cron: "37 6 * * *"
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ github.repository }}
+  SARIF_FILE: trivy-results.sarif
 
 jobs:
-  build:
-    name: Build
+  scan_job:
+    name: Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,12 +21,12 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "docker.io/jgkirschbaum/another-ldap-auth:latest"
-          format: "sarif"
-          output: "trivy-results.sarif"
-          # severity: "CRITICAL,HIGH"
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          format: sarif
+          output:  ${{ env.SARIF_FILE }}
+          # severity: CRITICAL,HIGH
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: ${{ env.SARIF_FILE }}
