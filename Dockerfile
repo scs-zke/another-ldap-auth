@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED=0
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 RUN apk --no-cache add build-base openldap-dev libffi-dev
-COPY files/requirements.txt /tmp/requirements.txt
+COPY src/requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip setuptools
 RUN pip install -r /tmp/requirements.txt --no-cache-dir
 
