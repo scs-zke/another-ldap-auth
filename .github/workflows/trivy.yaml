@@ -1,9 +1,9 @@
-name: Scan Docker image
+name: Scan Docker Image
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "37 6 * * *"
+    - cron: "27 6 * * *"
 
 env:
   REGISTRY: docker.io
