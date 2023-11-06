@@ -3,4 +3,4 @@ src/__pycache__
 export.sh
 pullsecret.yaml
 deploy.sh
-test.sh
+test.*

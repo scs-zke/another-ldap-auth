@@ -1,6 +1,8 @@
 # pylint: disable=missing-docstring
 
 from os import environ
+import secrets
+import string
 
 from flask import Flask
 from flask import request
@@ -19,7 +21,9 @@ if "LDAP_HTTPS_SUPPORT" in environ:
     LDAP_HTTPS_SUPPORT = environ["LDAP_HTTPS_SUPPORT"] == "enabled"
 
 # Key for encrypt the Session
-FLASK_SECRET_KEY = "CHANGE_ME!"
+FLASK_SECRET_KEY = "".join(
+    secrets.choice(string.ascii_letters + string.digits) for i in range(64)
+)
 if "FLASK_SECRET_KEY" in environ:
     FLASK_SECRET_KEY = str(environ["FLASK_SECRET_KEY"])
 
@@ -272,6 +276,7 @@ def remove_header(response):
 if __name__ == "__main__":
     app.secret_key = FLASK_SECRET_KEY
     if LDAP_HTTPS_SUPPORT:
+        print("### FIXME ###")
         app.run(host="0.0.0.0", port=9000, debug=False, ssl_context="adhoc")
     else:
         app.run(host="0.0.0.0", port=9000, debug=False)
