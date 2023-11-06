@@ -1,3 +1,6 @@
-files/__pycache__
-export.sh
+src/__pycache__
 .vscode
+export.sh
+pullsecret.yaml
+deploy.sh
+test.sh

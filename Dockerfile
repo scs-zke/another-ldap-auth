@@ -24,7 +24,7 @@ ENV HOME /home/$USER
 RUN addgroup -g $GID -S $GROUP && adduser -u $UID -S $USER -G $GROUP
 
 # Python code
-COPY files/* $HOME/
+COPY src/* $HOME/
 RUN chown -R $USER:$GROUP $HOME
 
 EXPOSE 9000

@@ -1,5 +1,36 @@
 repos:
-- repo: https://github.com/norwoodj/helm-docs
-  rev: v1.5.0
-  hooks:
-  - id: helm-docs
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-ast
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-aws-credentials
+        args: ["--allow-missing-credentials"]
+      - id: fix-byte-order-marker
+
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.11.3
+    hooks:
+      - id: helm-docs
+
+  - repo: local
+    hooks:
+      - id: helm lint
+        name: helm-lint
+        entry: bash -c "cd charts && helm lint *"
+        language: system
+        pass_filenames: false
+      - id: helm unittest
+        name: helm-unittest
+        entry: bash -c "cd charts && helm unittest -3 *"
+        language: system
+        pass_filenames: false
