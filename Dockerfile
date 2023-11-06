@@ -1,19 +1,17 @@
 FROM python:3.12.0-alpine3.18
 
-ENV LDAP_ENDPOINT=""
-ENV LDAP_MANAGER_DN_USERNAME=""
-ENV LDAP_MANAGER_PASSWORD=""
-ENV LDAP_SEARCH_BASE=""
-ENV LDAP_SEARCH_FILTER=""
-ENV FLASK_SECRET_KEY="CHANGE_ME!"
+ENV PYTHONUNBUFFERED=1
+# ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
-ENV PYTHONUNBUFFERED=0
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
-
-RUN apk --no-cache add build-base openldap-dev libffi-dev
 COPY src/requirements.txt /tmp/requirements.txt
-RUN pip install --upgrade pip setuptools
-RUN pip install -r /tmp/requirements.txt --no-cache-dir
+RUN apk upgrade -U && \
+    apk --no-cache add \
+        build-base \
+        openldap-dev \
+        libffi-dev && \
+    rm -rf /var/cache/apk/* && \
+    pip install --upgrade pip setuptools && \
+    pip install -r /tmp/requirements.txt --no-cache-dir
 
 # Run as non-root
 ENV USER aldap
