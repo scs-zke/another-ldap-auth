@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring
 
 from os import environ
+import platform
 import secrets
 import string
 
@@ -8,6 +9,7 @@ from flask import Flask
 from flask import request
 from flask import g
 from flask_httpauth import HTTPBasicAuth
+import gunicorn.app.base
 
 from aldap import Aldap
 from bruteforce import BruteForce
@@ -15,11 +17,6 @@ from cache import Cache
 from logs import Logs
 
 # --- Parameters --------------------------------------------------------------
-# Enable or disable SSL self-signed certificate
-LDAP_HTTPS_SUPPORT = False
-if "LDAP_HTTPS_SUPPORT" in environ:
-    LDAP_HTTPS_SUPPORT = environ["LDAP_HTTPS_SUPPORT"] == "enabled"
-
 # Key for encrypt the Session
 FLASK_SECRET_KEY = "".join(
     secrets.choice(string.ascii_letters + string.digits) for i in range(64)
@@ -46,6 +43,51 @@ if "BRUTE_FORCE_EXPIRATION" in environ:
 BRUTE_FORCE_FAILURES = 3
 if "BRUTE_FORCE_FAILURES" in environ:
     BRUTE_FORCE_FAILURES = int(environ["BRUTE_FORCE_FAILURES"])
+
+# Use gunicorn as WSGI server
+USE_WSGI_SERVER = True
+if "USE_WSGI_SERVER" in environ and environ["USE_WSGI_SERVER"].lower() in (
+    "0",
+    "false",
+    "n",
+    "no",
+    "off",
+):
+    USE_WSGI_SERVER = False
+
+# Enable or disable TLS self-signed certificate without WSGI server
+TLS_ENABLED = False
+if "TLS_ENABLED" in environ and environ["TLS_ENABLED"].lower() in (
+    "1",
+    "true",
+    "y",
+    "yes",
+    "on",
+):
+    TLS_ENABLED = True
+
+# TLS key and certificate WSGI server
+if TLS_ENABLED and USE_WSGI_SERVER:
+    if "TLS_KEY_FILE" in environ:
+        TLS_KEY_FILE = environ["TLS_KEY_FILE"]
+    else:
+        raise ValueError("TLS_KEY_FILE must be set when using TLS and WSGI server")
+    if "TLS_CERT_FILE" in environ:
+        TLS_CERT_FILE = environ["TLS_CERT_FILE"]
+    else:
+        raise ValueError("TLS_CERT_FILE must be set when using TLS and WSGI server")
+    if "TLS_CA_CERT_FILE" in environ:
+        TLS_CA_CERT_FILE = environ["TLS_CA_CERT_FILE"]
+    else:
+        TLS_CA_CERT_FILE = None
+
+# Number of gunicorn workers
+# Should be 1 because of credentials caching
+NUMBER_OF_WORKERS = 1
+if "NUMBER_OF_WORKERS" in environ:
+    NUMBER_OF_WORKERS = int(environ["NUMBER_OF_WORKERS"])
+
+PORT = 9000
 
 
 # --- Functions ---------------------------------------------------------------
@@ -250,6 +292,14 @@ def login(username, password):
     return True
 
 
+# Health-Check URL
+@app.route("/healthz", defaults={"path": "/healthz"})
+def healthz(path):  # pylint: disable=unused-argument
+    code = 200
+    msg = "OK"
+    return msg, code
+
+
 # Catch-All URL
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
@@ -275,8 +325,46 @@ def remove_header(response):
 # Main
 if __name__ == "__main__":
     app.secret_key = FLASK_SECRET_KEY
-    if LDAP_HTTPS_SUPPORT:
-        print("### FIXME ###")
-        app.run(host="0.0.0.0", port=9000, debug=False, ssl_context="adhoc")
+
+    if USE_WSGI_SERVER and platform.uname().system.lower() == "linux":
+        class StandaloneApplication(gunicorn.app.base.BaseApplication):
+            def __init__(self, g_app, g_options=None):
+                self.options = g_options or {}
+                self.application = g_app
+                super().__init__()
+
+            def init(self, parser, opts, args):
+                pass
+
+            def load_config(self):
+                config = {
+                    key: value
+                    for key, value in self.options.items()
+                    if key in self.cfg.settings and value is not None
+                }
+                for key, value in config.items():
+                    self.cfg.set(key.lower(), value)
+
+            def load(self):
+                return self.application
+
+        options = {
+            "bind": f"0.0.0.0:{PORT}",
+            "workers": NUMBER_OF_WORKERS,
+            "threads": 1,
+            "timeout": 5,
+        }
+        if TLS_ENABLED:
+            options["certfile"] = TLS_CERT_FILE
+        if TLS_ENABLED:
+            options["keyfile"] = TLS_KEY_FILE
+        if TLS_ENABLED and TLS_CA_CERT_FILE:
+            options["ca_certs"] = TLS_CA_CERT_FILE
+
+        StandaloneApplication(app, options).run()
     else:
-        app.run(host="0.0.0.0", port=9000, debug=False)
+        print("Detected non Linux, Running in pure Flask")
+        if TLS_ENABLED:
+            app.run(host="0.0.0.0", port=PORT, debug=False, ssl_context="adhoc")
+        else:
+            app.run(host="0.0.0.0", port=PORT, debug=False)

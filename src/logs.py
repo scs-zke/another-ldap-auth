@@ -36,6 +36,10 @@ class Logs:
         else:
             print(" - ".join(map(str, fields.values())))
 
+    def debug(self, extraFields):
+        if self.level in ["INFO", "WARNING", "ERROR", "DEBUG"]:
+            self.__print__("DEBUG", extraFields)
+
     def error(self, extraFields):
         if self.level in ["INFO", "WARNING", "ERROR"]:
             self.__print__("ERROR", extraFields)
