@@ -4,14 +4,14 @@ ENV PYTHONUNBUFFERED=1
 # ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 COPY src/requirements.txt /tmp/requirements.txt
-RUN apk upgrade -U && \
-    apk --no-cache add \
+RUN apk --update --no-cache upgrade && \
+    apk --update --no-cache add \
         build-base \
         openldap-dev \
         libffi-dev && \
     rm -rf /var/cache/apk/* && \
-    pip install --upgrade pip setuptools && \
-    pip install -r /tmp/requirements.txt --no-cache-dir
+    pip install --upgrade --no-cache-dir pip setuptools && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Run as non-root
 ENV USER aldap
