@@ -11,7 +11,7 @@ RUN apk --update --no-cache upgrade && \
         libffi-dev && \
     rm -rf /var/cache/apk/* && \
     pip install --upgrade --no-cache-dir pip setuptools && \
-    pip install --no-cache-dir -r /tmp/requirements.txt
+    pip install --upgrade --no-cache-dir -r /tmp/requirements.txt
 
 # Run as non-root
 ENV USER aldap
