@@ -1,25 +1,27 @@
 # Another LDAP authentication
 
-⚠️ This version of _Another LDAP Auth_ is forked from <https://github.com/dignajar/another-ldap-auth>
+| ⚠️ This version of ___Another LDAP Auth___ is forked from <https://github.com/dignajar/another-ldap-auth> |
 
-**LDAP Authentication** for **Nginx**, **Nginx ingress controller** (Kubernetes), **HAProxy** ([haproxy-auth-request](https://github.com/TimWolla/haproxy-auth-request)) or any webserver/reverse proxy with authorization based on the result of a subrequest.
+__LDAP Authentication__ for __Nginx__, __Nginx ingress controller__ (Kubernetes), __HAProxy__ ([haproxy-auth-request](https://github.com/TimWolla/haproxy-auth-request)) or any webserver/reverse proxy with authorization based on the result of a subrequest.
 
-**Another LDAP Authentication** is an implementation of the `ldap-auth-daemon` services described in the official blog from Nginx in the [following article](https://www.nginx.com/blog/nginx-plus-authenticate-users/).
+__Another LDAP Authentication__ is an implementation of the `ldap-auth-daemon` services described in the official blog from Nginx in the [following article](https://www.nginx.com/blog/nginx-plus-authenticate-users/).
 
-**Another LDAP Authentication** it's prepared to run inside a Docker container, also you can run the Python script without the Docker container.
+__Another LDAP Authentication__ is prepared to run inside a Docker container, also you can run the Python script without the Docker container.
 
 [![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue.svg)](https://hub.docker.com/r/jgkirschbaum/another-ldap-auth)
-[![Kubernetes YAML manifests](https://img.shields.io/badge/Kubernetes-manifests-blue.svg)](https://github.com/jgkirschbaum/another-ldap-auth/tree/master/kubernetes)
-[![codebeat badge](https://codebeat.co/badges/fefb2c70-878f-4f34-bbb7-cfbc8071bb03)](https://codebeat.co/projects/github-com-jgkirschbaum-another-ldap-auth-master)
+[![Helm Chart](https://img.shields.io/badge/Helm-Chart-informational?style=flat-square)](https://github.com/jgkirschbaum/another-ldap-auth/tree/gh-pages)
+[![Kubernetes YAML manifests](https://img.shields.io/badge/Kubernetes-Manifests-blue.svg)](https://github.com/jgkirschbaum/another-ldap-auth/tree/main/kubernetes)
+[![codebeat badge](https://codebeat.co/badges/30de967a-57ad-4769-8fb9-7e1b007a91e5)](https://codebeat.co/projects/github-com-jgkirschbaum-another-ldap-auth-main)
 [![release](https://img.shields.io/github/v/release/jgkirschbaum/another-ldap-auth.svg)](https://github.com/jgkirschbaum/another-ldap-auth/releases)
-[![license](https://img.shields.io/badge/license-MIT-green)](https://github.com/jgkirschbaum/another-ldap-auth/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/jgkirschbaum/another-ldap-auth/blob/main/LICENSE)
 
 ## Features
 
 - Supports `ldap` and `ldaps`.
 - Provide a cache for users and groups, you can set the cache expiration in minutes.
 - Supports validation by groups, regex in groups are supported.
-- Supports TLS via self-signed certificate.
+- Supports TLS.
+- Supports ad-hoc TLS via self-signed certificate.
 - Supports configuration via headers or via environment variables.
 - Supports HTTP response headers such as username and matched groups.
 - Brute force protection.
@@ -49,8 +51,8 @@ All values type are `string`.
 | LDAP_SEARCH_BASE                      |           |                                  |                                                                                        | `DC=TESTMYLDAP,DC=COM`                                         |
 | LDAP_SEARCH_FILTER                    |           |                                  | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`.| `(sAMAccountName={username})`                                  |
 | LDAP_BIND_DN                          | `{username}` |                                  | Depends on your LDAP server the binding structure can change. This field support variable expansion for the username.     | `{username}@TESTMYLDAP.com` or `UID={username},OU=PEOPLE,DC=TESTMYLDAP,DC=COM` |
-| LDAP_ALLOWED_USERS **(Optional)**     |            |                                  | Support a list separated by commas.| `'diego,john,s-master'` |
-| LDAP_ALLOWED_GROUPS **(Optional)**    |           |                                  | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
+| LDAP_ALLOWED_USERS __(Optional)__     |            |                                  | Support a list separated by commas.| `'diego,john,s-master'` |
+| LDAP_ALLOWED_GROUPS __(Optional)__    |           |                                  | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
 | LDAP_ALLOWED_GROUPS_CONDITIONAL       | `and`     | `and`, `or`                      | Conditional to match all the groups in the list or just one of them.                   | `or`                                                           |
 | LDAP_ALLOWED_GROUPS_CASE_SENSITIVE    | `enabled` | `enabled`, `disabled`            | Enabled or disabled case sensitive groups matches.                                     | `disabled`                                                     |
 | LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL | `or`      | `and`, `or`                      | Conditional to match user and at least one group in the list, or one of the two        | `and`                                                          |
@@ -84,7 +86,7 @@ The variables send via HTTP headers take precedence over environment variables.
 
 ## Installation and configuration
 
-The easy way to use **Another LDAP Authentication** is running as a Docker container and set the parameters via environment variables.
+The easy way to use __Another LDAP Authentication__ is running as a Docker container and set the parameters via environment variables.
 
 ### Step 1 - Run as a Docker container
 
@@ -104,7 +106,7 @@ docker run -d \
     jgkirschbaum/another-ldap-auth:latest
 ```
 
-**Another LDAP Authentication** now is running on `http://localhost:9000`.
+__Another LDAP Authentication__ now is running on `http://localhost:9000`.
 
 Test it via curl:
 
@@ -128,7 +130,7 @@ Output from ALDAP:
 
 Nginx use the module [ngx_http_auth_request_module](http://nginx.org/en/docs/http/ngx_http_auth_request_module.html) to do the subrequest.
 
-The following example shows how to configure Nginx that is running in the same machine as **Another LDAP Authentication**. The backend `/private/` includes the authentication request to `/another_ldap_auth`.
+The following example shows how to configure Nginx that is running in the same machine as __Another LDAP Authentication__. The backend `/private/` includes the authentication request to `/another_ldap_auth`.
 
 ```nginx
 location /private/ {
@@ -151,11 +153,11 @@ Now you can access to your website wich is going to be something like this `http
 
 Get the K8s manifests from the folder `/kubernetes`.
 
-The manifests for K8s helps to deploy **Another LDAP Authentication** in the namespace `ingress-nginx` and expose the service in the cluster at the following address `https://another-ldap-auth.ingress-nginx`.
+The manifests for K8s helps to deploy __Another LDAP Authentication__ in the namespace `ingress-nginx` and expose the service in the cluster at the following address `https://another-ldap-auth.ingress-nginx`.
 
 Please change the environment variables from the manifest and the secret for the bind username.
 
-After you have running **Another LDAP Authentication** in your Kubernetes, you can modify the ingress manifest from the application you want to protect.
+After you have running __Another LDAP Authentication__ in your Kubernetes, you can modify the ingress manifest from the application you want to protect.
 
 You can remove the comment `#` and send headers as variables such as `Matching groups`.
 
