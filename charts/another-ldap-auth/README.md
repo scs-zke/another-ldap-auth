@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.9.1](https://img.shields.io/badge/Version-0.9.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.5](https://img.shields.io/badge/AppVersion-3.0.5-informational?style=flat-square)
 
 Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -14,45 +14,49 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| affinity | object | `{}` | Special node affinity settings |
+| autoscaling | object | *See values defined below* | Definitions for the [Horizontal Pod Autoscaler (HPA)](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/), usually not needed. First try setting `numberOfWorkers` |
+| autoscaling.enabled | bool | `false` | Wether the hpa is enabled or not |
+| autoscaling.maxReplicas | int | `100` | Maximim number of replicas |
+| autoscaling.minReplicas | int | `1` | How many replicas shout at least exist |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` | When should new replicas be started depending on cpu utilization |
+| autoscaling.targetMemoryUtilizationPercentage | string | `""` | When should new replicas be started depending on memory utilization |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"dignajar/another-ldap-auth"` |  |
-| image.tag | string | `"2.2.1"` |  |
+| image.repository | string | `"jgkirschbaum/another-ldap-auth"` |  |
+| image.tag | string | `"3.1.0"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` |  |
-| ldap.cacheExpiration | int | `10` |  |
+| ldap.cacheExpiration | int | `60` |  |
 | ldap.endpoint | string | `"ldaps://testmyldap.com:636"` |  |
-| ldap.existingSecret | string | `nil` |  |
-| ldap.httpsSupport | string | `"enabled"` |  |
-| ldap.logFormat | string | `"TEXT"` |  |
-| ldap.logLevel | string | `"INFO"` |  |
 | ldap.managerDnPassword | string | `nil` |  |
 | ldap.managerDnUsername | string | `"CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"` |  |
 | ldap.searchBase | string | `"DC=TESTMYLDAP,DC=COM"` |  |
 | ldap.searchFilter | string | `"(sAMAccountName={username})"` |  |
 | nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| podAnnotations | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
+| nodeSelector | object | `{}` | Special node selector settings |
+| podAnnotations | object | `{}` | Special annotations for the pod |
+| podSecurityContext | object | `{}` | Special security context for the pod |
 | replicaCount | int | `1` |  |
-| resources.limits.cpu | string | `"500m"` |  |
-| resources.limits.memory | string | `"256Mi"` |  |
-| resources.requests.cpu | string | `"50m"` |  |
-| resources.requests.memory | string | `"64Mi"` |  |
-| securityContext | object | `{}` |  |
-| service.containerPort | int | `9000` |  |
-| service.port | int | `80` |  |
-| service.protocol | string | `"TCP"` |  |
-| service.type | string | `"ClusterIP"` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  |
-| tolerations | list | `[]` |  |
+| resources | object | `{}` | Resource requests and limits |
+| securityContext | object | `{}` | Special security context for the container |
+| server.TlsCaCert | string | `""` |  |
+| server.TlsCert | string | `""` |  |
+| server.TlsEnabled | bool | `false` |  |
+| server.TlsKey | string | `""` |  |
+| server.existingSecret | string | `""` |  |
+| server.logFormat | string | `"TEXT"` |  |
+| server.logLevel | string | `"INFO"` |  |
+| server.numberOfWorkers | int | `1` |  |
+| server.useWsgiServer | bool | `true` |  |
+| service.containerPort | int | `9000` | Port of the container to connect |
+| service.port | int | `80` | Port of the service |
+| service.protocol | string | `"TCP"` | Protocol of the service |
+| service.type | string | `"ClusterIP"` | Type of the service |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| tolerations | list | `[]` | Special tolerations settings |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
+Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)

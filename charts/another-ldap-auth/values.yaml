@@ -1,21 +1,29 @@
 replicaCount: 1
 
 image:
-  repository: dignajar/another-ldap-auth
+  repository: jgkirschbaum/another-ldap-auth
   pullPolicy: IfNotPresent
-  tag: "2.2.1"
+  tag: "3.1.0"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# AD config
-ldap:
-  existingSecret:
+# HTTP server config
+server:
+  useWsgiServer: true
+  numberOfWorkers: 1
+  TlsEnabled: false
+  TlsKey: ""
+  TlsCert: ""
+  TlsCaCert: ""
   logLevel: "INFO"
   logFormat: "TEXT"
-  cacheExpiration: 10
-  httpsSupport: "enabled"
+  existingSecret: ""
+
+# LDAP config
+ldap:
+  cacheExpiration: 60
   endpoint: "ldaps://testmyldap.com:636"
   managerDnUsername: "CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"
   managerDnPassword:
@@ -24,50 +32,63 @@ ldap:
   searchFilter: "(sAMAccountName={username})"
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+# -- Special annotations for the pod
 podAnnotations: {}
 
+# -- Special security context for the pod
 podSecurityContext: {}
   # fsGroup: 2000
 
+# -- Special security context for the container
 securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
-  # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+  # runAsUser: 1001
+  # runAsGroup: 1001
 
 service:
+  # -- Type of the service
   type: ClusterIP
+  # -- Port of the service
   port: 80
+  # -- Protocol of the service
   protocol: TCP
+  # -- Port of the container to connect
   containerPort: 9000
 
-resources:
-  limits:
-    cpu: 500m
-    memory: 256Mi
-  requests:
-    cpu: 50m
-    memory: 64Mi
+# -- Resource requests and limits
+resources: {}
 
+# -- Definitions for the [Horizontal Pod Autoscaler (HPA)](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/), usually not needed.
+# First try setting `numberOfWorkers`
+# @default -- *See values defined below*
 autoscaling:
+  # -- Wether the hpa is enabled or not
   enabled: false
+  # -- How many replicas shout at least exist
   minReplicas: 1
+  # -- Maximim number of replicas
   maxReplicas: 100
+  # -- When should new replicas be started depending on cpu utilization
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  # -- When should new replicas be started depending on memory utilization
+  targetMemoryUtilizationPercentage: ""
 
+# -- Special node selector settings
 nodeSelector: {}
 
+# -- Special tolerations settings
 tolerations: []
 
+# -- Special node affinity settings
 affinity: {}
