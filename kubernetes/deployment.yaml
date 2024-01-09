@@ -17,25 +17,25 @@ spec:
         app: another-ldap-auth
     spec:
       containers:
-        - image: dignajar/another-ldap-auth:latest
+        - image: jgkirschbaum/another-ldap-auth:latest
           imagePullPolicy: Always
           name: another-ldap-auth
           ports:
-            - name: https
+            - name: http
               containerPort: 9000
           env:
             - name: LDAP_ENDPOINT
-              value: "ldaps://testmyldap.com:636"
+              value: "ldaps://ldapserver.example.org:636"
             - name: LDAP_MANAGER_DN_USERNAME
-              value: "CN=john-service-user,OU=Administrators,DC=TESTMYLDAP,DC=COM"
+              value: "CN=john-service-user,OU=Administrators,DC=example,DC=org"
             - name: LDAP_SERVER_DOMAIN
-              value: "TESTMYLDAP"
+              value: "example"
             - name: LDAP_SEARCH_BASE
-              value: "DC=TESTMYLDAP,DC=COM"
+              value: "DC=example,DC=org"
             - name: LDAP_SEARCH_FILTER
               value: "(sAMAccountName={username})"
-            - name: LDAP_HTTPS_SUPPORT
-              value: "enabled"
+            - name: TLS_ENABLED
+              value: "false"
             - name: LOG_FORMAT
               value: "JSON"
             - name: LOG_LEVEL
@@ -54,8 +54,7 @@ spec:
                 - ALL
           resources:
             limits:
-              cpu: 500m
-              memory: 1Gi
+              memory: 256Mi
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
