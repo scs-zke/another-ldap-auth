@@ -1,6 +1,6 @@
 # Another LDAP authentication
 
-| ⚠️ This version of ___Another LDAP Auth___ is forked from <https://github.com/dignajar/another-ldap-auth> |
+ℹ This version of ___Another LDAP Auth___ is forked from <https://github.com/dignajar/another-ldap-auth> ℹ
 
 __LDAP Authentication__ for __Nginx__, __Nginx ingress controller__ (Kubernetes), __HAProxy__ ([haproxy-auth-request](https://github.com/TimWolla/haproxy-auth-request)) or any webserver/reverse proxy with authorization based on the result of a subrequest.
 
