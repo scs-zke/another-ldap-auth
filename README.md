@@ -55,9 +55,9 @@ All values type are `string`.
 | LDAP_ENDPOINT | | | LDAP URL with the protocol and the port number. | `ldaps://ldapsever.example.org:636` |
 | LDAP_MANAGER_DN_USERNAME | | | Username to bind and search in the LDAP tree. | `CN=john,OU=administrators,DC=example,DC=org`               |
 | LDAP_MANAGER_PASSWORD | | | Password for the bind user. | `top_secret` |
-| LDAP_SEARCH_BASE | | | | `DC=example,DC=org` |
+| LDAP_SEARCH_BASE | | | Base in directory tree where the search starts. | `DC=example,DC=org` |
 | LDAP_SEARCH_FILTER | | | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`. | `(sAMAccountName={username})` |
-| LDAP_BIND_DN | `{username}` | | Depends on your LDAP server the binding structure can change. This field support variable expansion for the username. | `{username}@example.org` or `UID={username},OU=people,DC=example,DC=org` |
+| LDAP_BIND_DN | `{username}` | | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. | `{username}@example.org` or `UID={username},OU=people,DC=example,DC=org` |
 | LDAP_ALLOWED_USERS __(Optional)__ | | | Support a list separated by commas.| `'john,jack,jeff'` |
 | LDAP_ALLOWED_GROUPS __(Optional)__ | | | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
 | LDAP_ALLOWED_GROUPS_CONDITIONAL | `and` | `and`, `or` | Conditional to match all the groups in the list or just one of them. | `or` |

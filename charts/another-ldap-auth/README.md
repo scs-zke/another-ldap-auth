@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.1](https://img.shields.io/badge/AppVersion-3.1.1-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.1.1](https://img.shields.io/badge/AppVersion-3.1.1-informational?style=flat-square)
 
 Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -21,34 +21,34 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | autoscaling.minReplicas | int | `1` | How many replicas shout at least exist |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | When should new replicas be started depending on cpu utilization |
 | autoscaling.targetMemoryUtilizationPercentage | string | `""` | When should new replicas be started depending on memory utilization |
-| fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"jgkirschbaum/another-ldap-auth"` |  |
-| image.tag | string | `"3.1.0"` |  |
-| imagePullSecrets | list | `[]` |  |
-| ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` |  |
-| ldap.cacheExpiration | int | `60` |  |
-| ldap.endpoint | string | `"ldaps://testmyldap.com:636"` |  |
-| ldap.managerDnPassword | string | `nil` |  |
-| ldap.managerDnUsername | string | `"CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"` |  |
-| ldap.searchBase | string | `"DC=TESTMYLDAP,DC=COM"` |  |
-| ldap.searchFilter | string | `"(sAMAccountName={username})"` |  |
-| nameOverride | string | `""` |  |
+| fullnameOverride | string | `""` | String to fully override rabbitmq.fullname template |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.repository | string | `"jgkirschbaum/another-ldap-auth"` | Path to the image |
+| image.tag | string | `"3.1.0"` | Image tag to use |
+| imagePullSecrets | list | `[]` | Specify docker-registry secret names as an array |
+| ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |
+| ldap.cacheExpiration | int | `5` | Cache expiration in minutes |
+| ldap.endpoint | string | `"ldaps://testmyldap.com:636"` | LDAP endpoint |
+| ldap.existingSecret | string | `""` | Use an existing secret for the `managerDnUsername` password |
+| ldap.managerDnPassword | string | `nil` | Passwort for `managerDnUsername`, only used when `existingSecret` is not set |
+| ldap.managerDnUsername | string | `"CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"` | Username for LDAP bind requests |
+| ldap.searchBase | string | `"DC=TESTMYLDAP,DC=COM"` | Base in directory tree where the search starts |
+| ldap.searchFilter | string | `"(sAMAccountName={username})"` | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName` |
+| nameOverride | string | `""` | String to partially override rabbitmq.fullname template (will maintain the release name) |
 | nodeSelector | object | `{}` | Special node selector settings |
 | podAnnotations | object | `{}` | Special annotations for the pod |
 | podSecurityContext | object | `{}` | Special security context for the pod |
-| replicaCount | int | `1` |  |
+| replicaCount | int | `1` | should not be changed, due to caching is done on a per pod basis. Only use it in very heavy loaded environments |
 | resources | object | `{}` | Resource requests and limits |
 | securityContext | object | `{}` | Special security context for the container |
-| server.TlsCaCert | string | `""` |  |
-| server.TlsCert | string | `""` |  |
-| server.TlsEnabled | bool | `false` |  |
-| server.TlsKey | string | `""` |  |
-| server.existingSecret | string | `""` |  |
-| server.logFormat | string | `"TEXT"` |  |
-| server.logLevel | string | `"INFO"` |  |
-| server.numberOfWorkers | int | `1` |  |
-| server.useWsgiServer | bool | `true` |  |
+| server.TlsCaCert | string | `""` | Server ca certificates |
+| server.TlsCert | string | `""` | Server certificate |
+| server.TlsEnabled | bool | `false` | Enable TLS for the pod. If `useWsgiServer` is `true` you also need the `TlsKey` and `TlsCert`.  If `useWsgiServer` is `false` you need not to specify `TlsKey` and `TlsCert` and use the on the fly generated key and certificate |
+| server.TlsKey | string | `""` | Server private key |
+| server.logFormat | string | `"TEXT"` | Logformat of the server: `TEXT` or `JSON` |
+| server.logLevel | string | `"INFO"` | Loglevel of the server: `INFO`, `WARNING`, `ERROR`, `DEBUG` |
+| server.numberOfWorkers | int | `1` | Number of worker processes for the [Gunicorn](https://gunicorn.org/) WSGI Server Should not be changed, due to caching is done on a per process basis Only use it in very heavy loaded environments |
+| server.useWsgiServer | bool | `true` | Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server |
 | service.containerPort | int | `9000` | Port of the container to connect |
 | service.port | int | `80` | Port of the service |
 | service.protocol | string | `"TCP"` | Protocol of the service |
