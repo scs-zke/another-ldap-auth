@@ -38,8 +38,6 @@ spec:
               value: "{{ .Values.ldap.cacheExpiration }}"
             - name: LDAP_ENDPOINT
               value: "{{ .Values.ldap.endpoint }}"
-            - name: LDAP_HTTPS_SUPPORT
-              value: "{{ .Values.ldap.httpsSupport }}"
             - name: LDAP_MANAGER_DN_USERNAME
               value: "{{ .Values.ldap.managerDnUsername }}"
             - name: LDAP_BIND_DN
@@ -49,14 +47,18 @@ spec:
             - name: LDAP_SEARCH_FILTER
               value: "{{ .Values.ldap.searchFilter }}"
             - name: LOG_LEVEL
-              value: "{{ .Values.ldap.logLevel }}"
+              value: "{{ .Values.server.logLevel }}"
             - name: LOG_FORMAT
-              value: "{{ .Values.ldap.logFormat }}"
+              value: "{{ .Values.server.logFormat }}"
             - name: LDAP_MANAGER_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ if .Values.ldap.existingSecret }}{{ .Values.ldap.existingSecret }}{{ else }}{{ include "another-ldap-auth.fullname" . }}{{ end }}
                   key: LDAP_MANAGER_PASSWORD
+            - name: USE_WSGI_SERVER
+              value: "{{ .Values.server.useWsgiServer }}"
+            - name: TLS_ENABLED
+              value: "{{ .Values.server.TlsEnabled }}"
           ports:
             - containerPort: {{ .Values.service.containerPort }}
               protocol: {{ .Values.service.protocol }}
