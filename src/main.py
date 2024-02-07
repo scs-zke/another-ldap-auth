@@ -327,6 +327,7 @@ if __name__ == "__main__":
     app.secret_key = FLASK_SECRET_KEY
 
     if USE_WSGI_SERVER and platform.uname().system.lower() == "linux":
+
         class StandaloneApplication(gunicorn.app.base.BaseApplication):
             def __init__(self, g_app, g_options=None):
                 self.options = g_options or {}

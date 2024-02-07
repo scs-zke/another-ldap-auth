@@ -46,7 +46,7 @@ All values type are `string`.
 
 | Key | Default | Values | Description | Example |
 | --- | ------- | ------ | ----------- | ------- |
-| USE_WSGI_SERVER | `true`| `true`, `false` | Enabled or disabled HTTPS support with self signed certificate. | |
+| USE_WSGI_SERVER | `true`| `true`, `false` | Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server. | |
 | NUMBER_OF_WORKERS __(Optional)__ | `1` | _`<int>`_ | Number of workers for the Gunicorn WSGI HTTP server. Should be one because of better cache performance as every worker has its own cache.  | 2 |
 | TLS_ENABLED | `true`| `true`, `false` | Enable or disable HTTPS support. When used without WSGI server the certificates are self signed and created automatically | |
 | TLS_KEY_FILE | `path_to_file`| | Path to the TLS key file in PEM format. | `/home/aldap/tls/server.key` |
@@ -132,7 +132,7 @@ Output from ALDAP:
 192.168.0.10 - - [21/May/2021 10:06:53] "GET / HTTP/1.1" 200 -
 ```
 
-> Remember you can enable self-signed certificate from Flask via the environment variable `TLS_ENABLED=="true"`.
+> Remember you can enable self-signed certificate from Flask via the environment variable `TLS_ENABLED=="true"` but only if `USE_WSGI_SERVER=="false"`.
 
 ### Step 2 - Nginx configuration
 
