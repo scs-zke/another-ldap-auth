@@ -30,7 +30,7 @@ __Another LDAP Authentication__ is prepared to run inside a Docker container, al
 
 ## Diagram
 
-![Another LDAP Authentication](https://camo.githubusercontent.com/170994cb57d0fa3f85999421c652bf5fd64342fa0cd6cea65fb7904ed4062061/68747470733a2f2f63646e2d312e77702e6e67696e782e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031362f30322f6c6461702d617574682d636f6d706f6e656e74732e6a7067)
+![Another LDAP Authentication](ldap-auth.png)
 
 ## Available configurations parameters
 
