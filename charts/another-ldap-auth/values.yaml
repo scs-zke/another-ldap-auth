@@ -84,11 +84,14 @@ autoscaling:
   # -- When should new replicas be started depending on memory utilization
   targetMemoryUtilizationPercentage: ""
 
+# -- Special node affinity settings
+affinity: {}
+
 # -- Special node selector settings
 nodeSelector: {}
 
 # -- Special tolerations settings
 tolerations: []
 
-# -- Special node affinity settings
-affinity: {}
+# -- Special topology settings
+topologySpreadConstraints: []
