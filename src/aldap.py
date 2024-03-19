@@ -28,8 +28,13 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         self.groupConditional = groupConditional.lower()
         self.groupCaseSensitive = groupCaseSensitive
 
-        ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
+        ### FIXME ###
+        # with options
+        # ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_HARD)
         self.connect = ldap.initialize(self.ldapEndpoint)
+        self.connect.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_HARD)
+        self.connect.set_option(ldap.OPT_X_TLS_CACERTFILE, "test-ca.crt")
+        self.connect.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
         self.connect.set_option(ldap.OPT_REFERRALS, 0)
         self.connect.set_option(ldap.OPT_DEBUG_LEVEL, 255)
 
