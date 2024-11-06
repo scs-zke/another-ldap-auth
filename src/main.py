@@ -18,9 +18,7 @@ from logs import Logs
 
 # --- Parameters --------------------------------------------------------------
 # Key for encrypt the Session
-FLASK_SECRET_KEY = "".join(
-    secrets.choice(string.ascii_letters + string.digits) for i in range(64)
-)
+FLASK_SECRET_KEY = "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(64))
 if "FLASK_SECRET_KEY" in environ:
     FLASK_SECRET_KEY = str(environ["FLASK_SECRET_KEY"])
 
@@ -46,24 +44,12 @@ if "BRUTE_FORCE_FAILURES" in environ:
 
 # Use gunicorn as WSGI server
 USE_WSGI_SERVER = True
-if "USE_WSGI_SERVER" in environ and environ["USE_WSGI_SERVER"].lower() in (
-    "0",
-    "false",
-    "n",
-    "no",
-    "off",
-):
+if "USE_WSGI_SERVER" in environ and environ["USE_WSGI_SERVER"].lower() in ("0", "false", "n", "no", "off"):
     USE_WSGI_SERVER = False
 
 # Enable or disable TLS self-signed certificate without WSGI server
 TLS_ENABLED = False
-if "TLS_ENABLED" in environ and environ["TLS_ENABLED"].lower() in (
-    "1",
-    "true",
-    "y",
-    "yes",
-    "on",
-):
+if "TLS_ENABLED" in environ and environ["TLS_ENABLED"].lower() in ("1", "true", "y", "yes", "on"):
     TLS_ENABLED = True
 
 # TLS key and certificate WSGI server
@@ -118,9 +104,7 @@ logs = Logs("main")
 cache = Cache(CACHE_EXPIRATION)
 
 # --- Brute Force -------------------------------------------------------------
-bruteForce = BruteForce(
-    BRUTE_FORCE_PROTECTION, BRUTE_FORCE_EXPIRATION, BRUTE_FORCE_FAILURES
-)
+bruteForce = BruteForce(BRUTE_FORCE_PROTECTION, BRUTE_FORCE_EXPIRATION, BRUTE_FORCE_FAILURES)
 
 # --- Flask -------------------------------------------------------------------
 app = Flask(__name__)
@@ -172,22 +156,16 @@ def login(username, password):
         # The default is "and", another option is "or"
         LDAP_ALLOWED_GROUPS_CONDITIONAL = "and"
         if "Ldap-Allowed-Groups-Conditional" in request.headers:
-            LDAP_ALLOWED_GROUPS_CONDITIONAL = request.headers[
-                "Ldap-Allowed-Groups-Conditional"
-            ]
+            LDAP_ALLOWED_GROUPS_CONDITIONAL = request.headers["Ldap-Allowed-Groups-Conditional"]
         elif "LDAP_ALLOWED_GROUPS_CONDITIONAL" in environ:
             LDAP_ALLOWED_GROUPS_CONDITIONAL = environ["LDAP_ALLOWED_GROUPS_CONDITIONAL"]
 
         # The default is "enabled", another option is "disabled"
         LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = True
         if "Ldap-Allowed-Groups-Case-Sensitive" in request.headers:
-            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = (
-                request.headers["Ldap-Allowed-Groups-Case-Sensitive"] == "enabled"
-            )
+            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = request.headers["Ldap-Allowed-Groups-Case-Sensitive"] == "enabled"
         elif "LDAP_ALLOWED_GROUPS_CASE_SENSITIVE" in environ:
-            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = (
-                environ["LDAP_ALLOWED_GROUPS_CASE_SENSITIVE"] == "enabled"
-            )
+            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = environ["LDAP_ALLOWED_GROUPS_CASE_SENSITIVE"] == "enabled"
 
         # List of users separated by comma
         LDAP_ALLOWED_USERS = ""
@@ -199,13 +177,9 @@ def login(username, password):
         # The default is "or", another option is "and"
         LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = "or"
         if "Ldap-Allowed-Groups-Users-Conditional" in request.headers:
-            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = request.headers[
-                "Ldap-Allowed-Groups-Users-Conditional"
-            ]
+            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = request.headers["Ldap-Allowed-Groups-Users-Conditional"]
         elif "LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL" in environ:
-            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = environ[
-                "LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL"
-            ]
+            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = environ["LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL"]
         if LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL not in ["or", "and"]:
             logs.error(
                 {
@@ -279,9 +253,7 @@ def login(username, password):
         matchingGroups = list(map(cleanMatchingGroups, matchingGroups))
         validGroups, matchedGroups = cache.validateGroups(username, matchingGroups)
         if not validGroups:
-            validGroups, matchedGroups, adGroups = aldap.validateGroups(
-                username, matchingGroups
-            )
+            validGroups, matchedGroups, adGroups = aldap.validateGroups(username, matchingGroups)
             if not validGroups:
                 return False
             else:
@@ -338,11 +310,7 @@ if __name__ == "__main__":
                 pass
 
             def load_config(self):
-                config = {
-                    key: value
-                    for key, value in self.options.items()
-                    if key in self.cfg.settings and value is not None
-                }
+                config = {key: value for key, value in self.options.items() if key in self.cfg.settings and value is not None}
                 for key, value in config.items():
                     self.cfg.set(key.lower(), value)
 
@@ -356,10 +324,10 @@ if __name__ == "__main__":
             "timeout": 5,
         }
         if TLS_ENABLED:
-            options["certfile"] = TLS_CERT_FILE
+            options["certfile"] = TLS_CERT_FILE  # pylint: disable=possibly-used-before-assignment
         if TLS_ENABLED:
-            options["keyfile"] = TLS_KEY_FILE
-        if TLS_ENABLED and TLS_CA_CERT_FILE:
+            options["keyfile"] = TLS_KEY_FILE  # pylint: disable=possibly-used-before-assignment
+        if TLS_ENABLED and TLS_CA_CERT_FILE:  # pylint: disable=possibly-used-before-assignment
             options["ca_certs"] = TLS_CA_CERT_FILE
 
         StandaloneApplication(app, options).run()
