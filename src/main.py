@@ -67,6 +67,11 @@ if TLS_ENABLED and USE_WSGI_SERVER:
     else:
         TLS_CA_CERT_FILE = None
 
+# TLS ca-certificates for LDAP connection
+LDAP_TLS_CA_CERT_FILE = None
+if "LDAP_TLS_CA_CERT_FILE" in environ:
+    LDAP_TLS_CA_CERT_FILE = environ["LDAP_TLS_CA_CERT_FILE"]
+
 # Number of gunicorn workers
 # Should be 1 because of credentials caching
 NUMBER_OF_WORKERS = 1
@@ -208,6 +213,7 @@ def login(username, password):
         LDAP_SEARCH_FILTER,
         LDAP_ALLOWED_GROUPS_CASE_SENSITIVE,
         LDAP_ALLOWED_GROUPS_CONDITIONAL,
+        LDAP_TLS_CA_CERT_FILE,
     )
 
     cache.settings(LDAP_ALLOWED_GROUPS_CASE_SENSITIVE, LDAP_ALLOWED_GROUPS_CONDITIONAL)

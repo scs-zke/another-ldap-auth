@@ -18,6 +18,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         searchFilter,
         groupCaseSensitive,
         groupConditional,
+        ldapTlsCaCert,
     ):
         self.ldapEndpoint = ldapEndpoint
         self.searchBase = searchBase
@@ -28,15 +29,13 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         self.groupConditional = groupConditional.lower()
         self.groupCaseSensitive = groupCaseSensitive
 
-        ### FIXME ###
-        # with options
-        # ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_HARD)
         self.connect = ldap.initialize(self.ldapEndpoint)
         self.connect.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_HARD)
-        self.connect.set_option(ldap.OPT_X_TLS_CACERTFILE, "test-ca.crt")
-        self.connect.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
+        if ldapTlsCaCert is not None:
+            self.connect.set_option(ldap.OPT_X_TLS_CACERTFILE, ldapTlsCaCert)
         self.connect.set_option(ldap.OPT_REFERRALS, 0)
         self.connect.set_option(ldap.OPT_DEBUG_LEVEL, 255)
+        self.connect.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
 
         self.logs = Logs(self.__class__.__name__)
 
@@ -84,9 +83,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         try:
             start = time.time()
             self.connect.simple_bind_s(self.dnUsername, self.dnPassword)
-            result = self.connect.search_s(
-                self.searchBase, ldap.SCOPE_SUBTREE, searchFilter
-            )
+            result = self.connect.search_s(self.searchBase, ldap.SCOPE_SUBTREE, searchFilter)
             # self.connect.unbind_s()
             end = time.time() - start
             self.logs.info(
@@ -97,11 +94,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
                 }
             )
         except ldap.LDAPError as e:
-            self.logs.error(
-                {
-                    "message": f"There was an error trying to bind meanwhile trying to do a search: {e}"
-                }
-            )
+            self.logs.error({"message": f"There was an error trying to bind meanwhile trying to do a search: {e}"})
 
         return result
 
@@ -116,9 +109,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
             # Extract the Common Name from the string (letters, spaces, underscores and hyphens)
             adGroup = re.search(r"(?i)CN=((\w*\s?_?-?)*)", adGroup).group(1)
         except Exception as e:
-            self.logs.warning(
-                {"message": f"There was an error trying to search CN: {e}"}
-            )
+            self.logs.warning({"message": f"There was an error trying to search CN: {e}"})
             return None
 
         # Disable case sensitive
@@ -162,9 +153,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         matchedGroups = []
         matchesByGroup = []
         for group in groups:
-            matches = list(
-                filter(None, list(map(self.__findMatch__, repeat(group), adGroups)))
-            )
+            matches = list(filter(None, list(map(self.__findMatch__, repeat(group), adGroups))))
             if matches:
                 matchesByGroup.append((group, matches))
                 matchedGroups.extend(matches)
