@@ -7,8 +7,12 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - protocol: TCP
+      {{- if .Values.service.port }}
+      port: {{ .Values.service.port }}
+      {{- else }}
+      port: {{ .Values.server.tlsEnabled | ternary 443 80 }}
+      {{- end }}
       targetPort: {{ .Values.service.containerPort }}
-      protocol: TCP
   selector:
     {{- include "another-ldap-auth.selectorLabels" . | nindent 4 }}

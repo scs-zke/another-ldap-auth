@@ -1,9 +1,0 @@
-{{- if not .Values.ldap.existingSecret -}}
-kind: Secret
-apiVersion: v1
-metadata:
-  name: {{ include "another-ldap-auth.fullname" . }}
-type: Opaque
-stringData:
-  LDAP_MANAGER_PASSWORD: "{{ .Values.ldap.managerDnPassword }}"
-{{- end }}

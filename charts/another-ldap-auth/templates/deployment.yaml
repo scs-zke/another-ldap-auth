@@ -13,17 +13,24 @@ spec:
       {{- include "another-ldap-auth.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/secretLdap: {{ include (print $.Template.BasePath "/secret-ldap.yaml") . | sha256sum }}
+        checksum/secretTls: {{ include (print $.Template.BasePath "/secret-tls.yaml") . | sha256sum }}
+        checksum/secretTlsLdap: {{ include (print $.Template.BasePath "/secret-tls-ldap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "another-ldap-auth.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      terminationGracePeriodSeconds: 5
       serviceAccountName: {{ include "another-ldap-auth.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -34,6 +41,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: PORT
+              value: "{{ .Values.service.containerPort }}"
             - name: CACHE_EXPIRATION
               value: "{{ .Values.ldap.cacheExpiration }}"
             - name: LDAP_ENDPOINT
@@ -58,12 +67,74 @@ spec:
             - name: USE_WSGI_SERVER
               value: "{{ .Values.server.useWsgiServer }}"
             - name: TLS_ENABLED
-              value: "{{ .Values.server.TlsEnabled }}"
+              value: "{{ .Values.server.tlsEnabled }}"
+            {{- if .Values.server.tlsEnabled }}
+            - name: TLS_KEY_FILE
+              value: /etc/ssl/private/tls/tls.key
+            - name: TLS_CERT_FILE
+              value: /etc/ssl/private/tls/tls.crt
+            {{- if .Values.server.tlsCaCert }}
+            - name: TLS_CA_CERT_FILE
+              value: /etc/ssl/private/tls/ca.crt
+            {{- end }}
+            {{- end }}
+            {{- if .Values.ldap.tlsCaCert }}
+            - name: LDAP_TLS_CA_CERT_FILE
+              value: /etc/ssl/private/ldap/ca.crt
+            {{- end }}
+            {{- if .Values.server.flaskSecretKey }}
+            - name: FLASK_SECRET_KEY
+              value: "{{ .Values.server.flaskSecretKey }}"
+            {{- end }}
+            - name: BRUTE_FORCE_PROTECTION
+              value: "{{ .Values.server.bruteForceProtection }}"
+            - name: BRUTE_FORCE_EXPIRATION
+              value: "{{ .Values.server.bruteForceExpiration }}"
+            - name: BRUTE_FORCE_FAILURES
+              value: "{{ .Values.server.bruteForceFailures }}"
           ports:
             - containerPort: {{ .Values.service.containerPort }}
               protocol: {{ .Values.service.protocol }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.containerPort }}
+              scheme: {{ .Values.server.tlsEnabled | ternary "HTTPS" "HTTP" }}
+            initialDelaySeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.containerPort }}
+              scheme: {{ .Values.server.tlsEnabled | ternary "HTTPS" "HTTP" }}
+            initialDelaySeconds: 3
+          {{- if or .Values.server.tlsEnabled .Values.ldap.tlsCaCert }}
+          volumeMounts:
+            {{- if or .Values.server.tlsEnabled }}
+            - name: another-ldap-auth-tls
+              mountPath: /etc/ssl/private/tls
+              readOnly: true
+            {{- end }}
+            {{- if .Values.ldap.tlsCaCert }}
+            - name: another-ldap-auth-tls-ldap
+              mountPath: /etc/ssl/private/ldap
+              readOnly: true
+            {{- end }}
+          {{- end }}
+      {{- if or .Values.server.tlsEnabled .Values.ldap.tlsCaCert }}
+      volumes:
+        {{- if .Values.server.tlsEnabled }}
+        - name: another-ldap-auth-tls
+          secret:
+            secretName: {{ include "another-ldap-auth.fullname" . }}-tls
+        {{- end }}
+        {{- if .Values.ldap.tlsCaCert }}
+        - name: another-ldap-auth-tls-ldap
+          secret:
+            secretName: {{ include "another-ldap-auth.fullname" . }}-tls-ldap
+        {{- end }}
+      {{- end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

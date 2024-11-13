@@ -8,7 +8,7 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
   # -- Image tag to use
-  tag: "3.1.0"
+  tag: "3.2.1"
 
 # -- Specify docker-registry secret names as an array
 imagePullSecrets: []
@@ -24,26 +24,37 @@ server:
   # Should not be changed, due to caching is done on a per process basis
   # Only use it in very heavy loaded environments
   numberOfWorkers: 1
-  # -- Enable TLS for the pod. If `useWsgiServer` is `true` you also need the `TlsKey` and `TlsCert`.
-  #  If `useWsgiServer` is `false` you need not to specify `TlsKey` and `TlsCert` and use the on the fly
+  # -- Enable TLS for the pod. If `useWsgiServer` is `true` you also need the `tlsKey` and `tlsCert`.
+  #  If `useWsgiServer` is `false` you need not to specify `tlsKey` and `tlsCert` and use the on the fly
   # generated key and certificate
-  TlsEnabled: false
+  tlsEnabled: false
   # -- Server private key
-  TlsKey: ""
+  tlsKey: ""
   # -- Server certificate
-  TlsCert: ""
+  tlsCert: ""
   # -- Server ca certificates
-  TlsCaCert: ""
+  tlsCaCert: ""
   # -- Loglevel of the server: `INFO`, `WARNING`, `ERROR`, `DEBUG`
   logLevel: "INFO"
   # -- Logformat of the server: `TEXT` or `JSON`
   logFormat: "TEXT"
+  # -- Key for signing the session cookie, see [Flask documentation](https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY)
+  # and a pretty comprehensive [answer](https://stackoverflow.com/questions/22463939/demystify-flask-app-secret-key) on stackoverflow.
+  # Usually no need to set it, but if you want to use the same key for multiple pods you can set it here.
+  flaskSecretKey: ""
+  # -- Enable or disable brute force protection.
+  # Brute force protection is blocking user IP, please read this [article](https://owasp.org/www-community/controls/Blocking_Brute_Force_Attacks) to know the limitations about blocking IPs
+  bruteForceProtection: false
+  # -- Expire entry after number in seconds
+  bruteForceExpiration: 10
+  # -- Block after number failures
+  bruteForceFailures: 3
 
 ldap:
   # -- Use an existing secret for the `managerDnUsername` password
   existingSecret: ""
   # -- Cache expiration in minutes
-  cacheExpiration: 5
+  cacheExpiration: 15
   # -- LDAP endpoint
   endpoint: "ldaps://testmyldap.com:636"
   # -- Username for LDAP bind requests
@@ -57,6 +68,8 @@ ldap:
   searchBase: "DC=TESTMYLDAP,DC=COM"
   # -- Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`
   searchFilter: "(sAMAccountName={username})"
+  # -- ca certificates for the LDAP connection
+  tlsCaCert: ""
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -70,24 +83,21 @@ serviceAccount:
 # -- Special annotations for the pod
 podAnnotations: {}
 
+# -- Special labels for the pod
+podLabels: {}
+
 # -- Special security context for the pod
 podSecurityContext: {}
-  # fsGroup: 2000
 
 # -- Special security context for the container
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # runAsNonRoot: true
-  # runAsUser: 1001
-  # runAsGroup: 1001
 
 service:
   # -- Type of the service
   type: ClusterIP
-  # -- Port of the service
-  port: 80
+  # -- Port of the service:
+  # `443` if `server.tlsEnabled` is `true` else `80`
+  port: ""
   # -- Protocol of the service
   protocol: TCP
   # -- Port of the container to connect
