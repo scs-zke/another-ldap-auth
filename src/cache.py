@@ -35,9 +35,7 @@ class Cache:
         Add user to the cache
         """
         if username not in self.cache:
-            self.logs.info(
-                {"message": "Adding user to the cache.", "username": username}
-            )
+            self.logs.info({"message": "Adding user to the cache.", "username": username})
             passwordHash = self.__hash__(password)  # pylint: disable=unnecessary-dunder-call
             self.cache[username] = {"password": passwordHash, "adGroups": []}
 
@@ -46,9 +44,7 @@ class Cache:
         Add user groups to the cache
         """
         if username in self.cache:
-            self.logs.info(
-                {"message": "Adding groups to the cache.", "username": username}
-            )
+            self.logs.info({"message": "Adding groups to the cache.", "username": username})
             self.cache[username]["adGroups"] = adGroups
 
     def validateUser(self, username: str, password: str) -> bool:
@@ -63,9 +59,7 @@ class Cache:
             return False
 
         if username in self.cache:
-            self.logs.info(
-                {"message": "Validating user via cache.", "username": username}
-            )
+            self.logs.info({"message": "Validating user via cache.", "username": username})
             passwordHash = self.__hash__(password)  # pylint: disable=unnecessary-dunder-call
             if passwordHash == self.cache[username]["password"]:
                 self.logs.info(
@@ -98,9 +92,7 @@ class Cache:
             # Extract the Common Name from the string (letters, spaces, underscores and hyphens)
             adGroup = re.search(r"(?i)CN=((\w*\s?_?-?)*)", adGroup).group(1)
         except Exception as e:  # pylint: disable=bare-except
-            self.logs.warning(
-                {"message": f"There was an error trying to search CN: {e}"}
-            )
+            self.logs.warning({"message": f"There was an error trying to search CN: {e}"})
             return None
 
         # Disable case sensitive
@@ -133,9 +125,7 @@ class Cache:
             matchedGroups = []
             matchesByGroup = []
             for group in groups:
-                matches = list(
-                    filter(None, list(map(self.__findMatch__, repeat(group), adGroups)))
-                )
+                matches = list(filter(None, list(map(self.__findMatch__, repeat(group), adGroups))))
                 if matches:
                     matchesByGroup.append((group, matches))
                     matchedGroups.extend(matches)

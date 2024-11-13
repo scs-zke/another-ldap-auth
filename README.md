@@ -49,9 +49,10 @@ All values type are `string`.
 | USE_WSGI_SERVER | `true`| `true`, `false` | Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server. | |
 | NUMBER_OF_WORKERS __(Optional)__ | `1` | _`<int>`_ | Number of workers for the Gunicorn WSGI HTTP server. Should be one because of better cache performance as every worker has its own cache.  | 2 |
 | TLS_ENABLED | `true`| `true`, `false` | Enable or disable HTTPS support. When used without WSGI server the certificates are self signed and created automatically | |
-| TLS_KEY_FILE | `path_to_file`| | Path to the TLS key file in PEM format. | `/home/aldap/tls/server.key` |
-| TLS_CERT_FILE | `path_to_file`| | Path to the TLS certificate file in PEM format. | `/home/aldap/tls/server.crt` |
-| TLS_CA_CERT_FILE | `path_to_file`| | Path to the TLS CA certificates file in PEM format. | `/home/aldap/tls/ca.crt` |
+| TLS_KEY_FILE | `path_to_file`| | Path to the TLS key file in PEM format. | `/etc/ssl/private/tls/tls.key` |
+| TLS_CERT_FILE | `path_to_file`| | Path to the TLS certificate file in PEM format. | `/etc/ssl/private/tls/tls.crt` |
+| TLS_CA_CERT_FILE | `path_to_file`| | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/tls/ca.crt` |
+| LDAP_TLS_CA_CERT_FILE | `path_to_file`| | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/ldap/ca.crt` |
 | LDAP_ENDPOINT | | | LDAP URL with the protocol and the port number. | `ldaps://ldapsever.example.org:636` |
 | LDAP_MANAGER_DN_USERNAME | | | Username to bind and search in the LDAP tree. | `CN=john,OU=administrators,DC=example,DC=org`               |
 | LDAP_MANAGER_PASSWORD | | | Password for the bind user. | `top_secret` |

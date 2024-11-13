@@ -18,9 +18,9 @@ from logs import Logs
 
 # --- Parameters --------------------------------------------------------------
 # Key for encrypt the Session
-FLASK_SECRET_KEY = "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(64))
+FLASK_SECRET_KEY = "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(64)).encode('utf8')
 if "FLASK_SECRET_KEY" in environ:
-    FLASK_SECRET_KEY = str(environ["FLASK_SECRET_KEY"])
+    FLASK_SECRET_KEY = str(environ["FLASK_SECRET_KEY"]).encode('utf8')
 
 # Cache expiration in minutes
 CACHE_EXPIRATION = 5
@@ -79,6 +79,8 @@ if "NUMBER_OF_WORKERS" in environ:
     NUMBER_OF_WORKERS = int(environ["NUMBER_OF_WORKERS"])
 
 PORT = 9000
+if "PORT" in environ:
+    PORT = int(environ["PORT"])
 
 
 # --- Functions ---------------------------------------------------------------
