@@ -70,6 +70,7 @@ All values type are `string`.
 | BRUTE_FORCE_PROTECTION | `disabled`| `enabled`, `disabled` | Enabled or disabled Brute force protection per IP. | |
 | BRUTE_FORCE_EXPIRATION | `10`| | Brute force expiration time in seconds per IP. | |
 | BRUTE_FORCE_FAILURES | `3`| | Number of failures before the IP is blocked.  | |
+| FLASK_SECRET_KEY | `""`| | Key for signing the session cookie. Usually no need to set it, but if you want to use the same key for multiple pods you can set it here. | |
 
 ### HTTP request headers
 
