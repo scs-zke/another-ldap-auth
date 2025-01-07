@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.2](https://img.shields.io/badge/AppVersion-3.2.2-informational?style=flat-square)
+![Version: 1.1.4](https://img.shields.io/badge/Version-1.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.3](https://img.shields.io/badge/AppVersion-3.2.3-informational?style=flat-square)
 
 Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -24,7 +24,7 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | fullnameOverride | string | `""` | String to fully override rabbitmq.fullname template |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"jgkirschbaum/another-ldap-auth"` | Path to the image |
-| image.tag | string | `"3.2.2"` | Image tag to use |
+| image.tag | string | `"3.2.3"` | Image tag to use |
 | imagePullSecrets | list | `[]` | Specify docker-registry secret names as an array |
 | ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |
 | ldap.cacheExpiration | int | `15` | Cache expiration in minutes |

@@ -8,7 +8,7 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
   # -- Image tag to use
-  tag: "3.2.2"
+  tag: "3.2.3"
 
 # -- Specify docker-registry secret names as an array
 imagePullSecrets: []
