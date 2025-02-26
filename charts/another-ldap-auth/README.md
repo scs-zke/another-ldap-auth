@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 1.1.4](https://img.shields.io/badge/Version-1.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.3](https://img.shields.io/badge/AppVersion-3.2.3-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.4](https://img.shields.io/badge/AppVersion-3.2.4-informational?style=flat-square)
 
 Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -29,6 +29,7 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |
 | ldap.cacheExpiration | int | `15` | Cache expiration in minutes |
 | ldap.endpoint | string | `"ldaps://testmyldap.com:636"` | LDAP endpoint |
+| ldap.existingCaSecret | string | `""` | the secret must contain `ca.crt`.  If set, `ldap.tlsCaCert` is ignored |
 | ldap.existingSecret | string | `""` | Use an existing secret for the `managerDnUsername` password |
 | ldap.managerDnPassword | string | `nil` | Passwort for `managerDnUsername`, only used when `existingSecret` is not set |
 | ldap.managerDnUsername | string | `"CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"` | Username for LDAP bind requests |
@@ -46,6 +47,7 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | server.bruteForceExpiration | int | `10` | Expire entry after number in seconds |
 | server.bruteForceFailures | int | `3` | Block after number failures |
 | server.bruteForceProtection | bool | `false` | Enable or disable brute force protection. Brute force protection is blocking user IP, please read this [article](https://owasp.org/www-community/controls/Blocking_Brute_Force_Attacks) to know the limitations about blocking IPs |
+| server.existingSecret | string | `""` | the secret must contain tls.key, tls.crt and ca.crt. If set, `tlsKey`, `tlsCert` and `tlsCaCert` are ignored |
 | server.flaskSecretKey | string | `""` | Key for signing the session cookie, see [Flask documentation](https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY) and a pretty comprehensive [answer](https://stackoverflow.com/questions/22463939/demystify-flask-app-secret-key) on stackoverflow. Usually no need to set it, but if you want to use the same key for multiple pods you can set it here. |
 | server.logFormat | string | `"TEXT"` | Logformat of the server: `TEXT` or `JSON` |
 | server.logLevel | string | `"INFO"` | Loglevel of the server: `INFO`, `WARNING`, `ERROR`, `DEBUG` |
