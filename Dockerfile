@@ -1,7 +1,6 @@
-FROM python:3.13.1-alpine3.21
+FROM python:3.13.2-alpine3.21
 
 ENV PYTHONUNBUFFERED=1
-# ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 COPY src/requirements.txt /tmp/requirements.txt
 RUN apk --update --no-cache upgrade && \
