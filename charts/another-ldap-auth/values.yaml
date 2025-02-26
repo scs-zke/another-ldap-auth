@@ -28,6 +28,8 @@ server:
   #  If `useWsgiServer` is `false` you need not to specify `tlsKey` and `tlsCert` and use the on the fly
   # generated key and certificate
   tlsEnabled: false
+  # -- the secret must contain tls.key, tls.crt and ca.crt. It obsoletes the setting for `tlsKey` and `tlsCert` and `tlsCaCert`
+  existingSecret: ""
   # -- Server private key
   tlsKey: ""
   # -- Server certificate
@@ -68,6 +70,8 @@ ldap:
   searchBase: "DC=TESTMYLDAP,DC=COM"
   # -- Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`
   searchFilter: "(sAMAccountName={username})"
+  # -- the secret must contain `ca.crt`. It obsoletes the setting for`tlsCaCert`
+  existingCaSecret: ""
   # -- ca certificates for the LDAP connection
   tlsCaCert: ""
 
