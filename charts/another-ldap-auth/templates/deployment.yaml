@@ -116,7 +116,7 @@ spec:
               mountPath: /etc/ssl/private/tls
               readOnly: true
             {{- end }}
-            {{- if .Values.ldap.tlsCaCert }}
+            {{- if or .Values.ldap.tlsCaCert .Values.ldap.existingCaSecret }}
             - name: another-ldap-auth-tls-ldap
               mountPath: /etc/ssl/private/ldap
               readOnly: true
@@ -127,12 +127,20 @@ spec:
         {{- if .Values.server.tlsEnabled }}
         - name: another-ldap-auth-tls
           secret:
+          {{- if not .Values.server.existingSecret }}
             secretName: {{ include "another-ldap-auth.fullname" . }}-tls
+          {{- else }}
+            secretName: {{ .Values.server.existingSecret }}
+          {{- end }}
         {{- end }}
         {{- if .Values.ldap.tlsCaCert }}
         - name: another-ldap-auth-tls-ldap
           secret:
+          {{- if not .Values.ldap.existingCaSecret }}
             secretName: {{ include "another-ldap-auth.fullname" . }}-tls-ldap
+          {{- else }}
+            secretName: {{ .Values.ldap.existingCaSecret }}
+          {{- end }}
         {{- end }}
       {{- end }}
       {{- with .Values.affinity }}
