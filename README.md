@@ -71,6 +71,8 @@ All values type are `string`.
 | BRUTE_FORCE_EXPIRATION | `10`| | Brute force expiration time in seconds per IP. | |
 | BRUTE_FORCE_FAILURES | `3`| | Number of failures before the IP is blocked.  | |
 | FLASK_SECRET_KEY | `""`| | Key for signing the session cookie. Usually no need to set it, but if you want to use the same key for multiple pods you can set it here. | |
+| RELOAD_ENABLED | `false` | `true`,`false` | Enable automatic reloading of workers, when the TLS certificates or other files were modified | |
+| RELOAD_EXTRA_FILES | `""` | | When reload is enabled, watch these files as well | `file1,file2,file3,etc.` |
 
 ### HTTP request headers
 
