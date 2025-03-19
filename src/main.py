@@ -1,6 +1,6 @@
 # pylint: disable=missing-docstring
 
-from os import environ
+import os
 import platform
 import secrets
 import string
@@ -19,68 +19,87 @@ from logs import Logs
 # --- Parameters --------------------------------------------------------------
 # Key for encrypt the Session
 FLASK_SECRET_KEY = "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(64)).encode('utf8')
-if "FLASK_SECRET_KEY" in environ:
-    FLASK_SECRET_KEY = str(environ["FLASK_SECRET_KEY"]).encode('utf8')
+if "FLASK_SECRET_KEY" in os.environ:
+    FLASK_SECRET_KEY = str(os.environ["FLASK_SECRET_KEY"]).encode('utf8')
 
 # Cache expiration in minutes
 CACHE_EXPIRATION = 5
-if "CACHE_EXPIRATION" in environ:
-    CACHE_EXPIRATION = int(environ["CACHE_EXPIRATION"])
+if "CACHE_EXPIRATION" in os.environ:
+    CACHE_EXPIRATION = int(os.environ["CACHE_EXPIRATION"])
 
 # Brute force enable or disable
 BRUTE_FORCE_PROTECTION = False
-if "BRUTE_FORCE_PROTECTION" in environ:
-    BRUTE_FORCE_PROTECTION = environ["BRUTE_FORCE_PROTECTION"] == "enabled"
+if "BRUTE_FORCE_PROTECTION" in os.environ:
+    BRUTE_FORCE_PROTECTION = os.environ["BRUTE_FORCE_PROTECTION"] == "enabled"
 
 # Brute force expiration in seconds
 BRUTE_FORCE_EXPIRATION = 10
-if "BRUTE_FORCE_EXPIRATION" in environ:
-    BRUTE_FORCE_EXPIRATION = int(environ["BRUTE_FORCE_EXPIRATION"])
+if "BRUTE_FORCE_EXPIRATION" in os.environ:
+    BRUTE_FORCE_EXPIRATION = int(os.environ["BRUTE_FORCE_EXPIRATION"])
 
 # Brute force amount of failures
 BRUTE_FORCE_FAILURES = 3
-if "BRUTE_FORCE_FAILURES" in environ:
-    BRUTE_FORCE_FAILURES = int(environ["BRUTE_FORCE_FAILURES"])
+if "BRUTE_FORCE_FAILURES" in os.environ:
+    BRUTE_FORCE_FAILURES = int(os.environ["BRUTE_FORCE_FAILURES"])
 
 # Use gunicorn as WSGI server
 USE_WSGI_SERVER = True
-if "USE_WSGI_SERVER" in environ and environ["USE_WSGI_SERVER"].lower() in ("0", "false", "n", "no", "off"):
+if "USE_WSGI_SERVER" in os.environ and os.environ["USE_WSGI_SERVER"].lower() in ("0", "false", "n", "no", "off"):
     USE_WSGI_SERVER = False
+
+# Enable or disable reload API
+RELOAD_ENABLED = False
+if "RELOAD_ENABLED" in os.environ and os.environ["RELOAD_ENABLED"].lower() in ("1", "true", "y", "yes", "on"):
+    RELOAD_ENABLED = True
+
+RELOAD_EXTRA_FILES = []
+if "RELOAD_EXTRA_FILES" in os.environ and os.environ["RELOAD_EXTRA_FILES"]:
+    RELOAD_EXTRA_FILES = os.environ["RELOAD_EXTRA_FILES"].split(',')
 
 # Enable or disable TLS self-signed certificate without WSGI server
 TLS_ENABLED = False
-if "TLS_ENABLED" in environ and environ["TLS_ENABLED"].lower() in ("1", "true", "y", "yes", "on"):
+if "TLS_ENABLED" in os.environ and os.environ["TLS_ENABLED"].lower() in ("1", "true", "y", "yes", "on"):
     TLS_ENABLED = True
 
 # TLS key and certificate WSGI server
 if TLS_ENABLED and USE_WSGI_SERVER:
-    if "TLS_KEY_FILE" in environ:
-        TLS_KEY_FILE = environ["TLS_KEY_FILE"]
+    if "TLS_KEY_FILE" in os.environ:
+        TLS_KEY_FILE = os.environ["TLS_KEY_FILE"]
+        if RELOAD_ENABLED:
+            RELOAD_EXTRA_FILES.append(TLS_KEY_FILE)
     else:
         raise ValueError("TLS_KEY_FILE must be set when using TLS and WSGI server")
-    if "TLS_CERT_FILE" in environ:
-        TLS_CERT_FILE = environ["TLS_CERT_FILE"]
+
+    if "TLS_CERT_FILE" in os.environ:
+        TLS_CERT_FILE = os.environ["TLS_CERT_FILE"]
+        if RELOAD_ENABLED:
+            RELOAD_EXTRA_FILES.append(TLS_CERT_FILE)
     else:
         raise ValueError("TLS_CERT_FILE must be set when using TLS and WSGI server")
-    if "TLS_CA_CERT_FILE" in environ:
-        TLS_CA_CERT_FILE = environ["TLS_CA_CERT_FILE"]
+
+    if "TLS_CA_CERT_FILE" in os.environ:
+        TLS_CA_CERT_FILE = os.environ["TLS_CA_CERT_FILE"]
+        if RELOAD_ENABLED:
+            RELOAD_EXTRA_FILES.append(TLS_CA_CERT_FILE)
     else:
         TLS_CA_CERT_FILE = None
 
 # TLS ca-certificates for LDAP connection
 LDAP_TLS_CA_CERT_FILE = None
-if "LDAP_TLS_CA_CERT_FILE" in environ:
-    LDAP_TLS_CA_CERT_FILE = environ["LDAP_TLS_CA_CERT_FILE"]
+if "LDAP_TLS_CA_CERT_FILE" in os.environ:
+    LDAP_TLS_CA_CERT_FILE = os.environ["LDAP_TLS_CA_CERT_FILE"]
+    if RELOAD_ENABLED:
+        RELOAD_EXTRA_FILES.append(LDAP_TLS_CA_CERT_FILE)
 
 # Number of gunicorn workers
 # Should be 1 because of credentials caching
 NUMBER_OF_WORKERS = 1
-if "NUMBER_OF_WORKERS" in environ:
-    NUMBER_OF_WORKERS = int(environ["NUMBER_OF_WORKERS"])
+if "NUMBER_OF_WORKERS" in os.environ:
+    NUMBER_OF_WORKERS = int(os.environ["NUMBER_OF_WORKERS"])
 
 PORT = 9000
-if "PORT" in environ:
-    PORT = int(environ["PORT"])
+if "PORT" in os.environ:
+    PORT = int(os.environ["PORT"])
 
 
 # --- Functions ---------------------------------------------------------------
@@ -131,62 +150,62 @@ def login(username, password):
         if "Ldap-Endpoint" in request.headers:
             LDAP_ENDPOINT = request.headers.get("Ldap-Endpoint")
         else:
-            LDAP_ENDPOINT = environ["LDAP_ENDPOINT"]
+            LDAP_ENDPOINT = os.environ["LDAP_ENDPOINT"]
 
         if "Ldap-Manager-Dn-Username" in request.headers:
             LDAP_MANAGER_DN_USERNAME = request.headers["Ldap-Manager-Dn-Username"]
         else:
-            LDAP_MANAGER_DN_USERNAME = environ["LDAP_MANAGER_DN_USERNAME"]
+            LDAP_MANAGER_DN_USERNAME = os.environ["LDAP_MANAGER_DN_USERNAME"]
 
         if "Ldap-Manager-Password" in request.headers:
             LDAP_MANAGER_PASSWORD = request.headers["Ldap-Manager-Password"]
         else:
-            LDAP_MANAGER_PASSWORD = environ["LDAP_MANAGER_PASSWORD"]
+            LDAP_MANAGER_PASSWORD = os.environ["LDAP_MANAGER_PASSWORD"]
 
         if "Ldap-Search-Base" in request.headers:
             LDAP_SEARCH_BASE = request.headers["Ldap-Search-Base"]
         else:
-            LDAP_SEARCH_BASE = environ["LDAP_SEARCH_BASE"]
+            LDAP_SEARCH_BASE = os.environ["LDAP_SEARCH_BASE"]
 
         if "Ldap-Search-Filter" in request.headers:
             LDAP_SEARCH_FILTER = request.headers["Ldap-Search-Filter"]
         else:
-            LDAP_SEARCH_FILTER = environ["LDAP_SEARCH_FILTER"]
+            LDAP_SEARCH_FILTER = os.environ["LDAP_SEARCH_FILTER"]
 
         # List of groups separated by comma
         LDAP_ALLOWED_GROUPS = ""
         if "Ldap-Allowed-Groups" in request.headers:
             LDAP_ALLOWED_GROUPS = request.headers["Ldap-Allowed-Groups"]
-        elif "LDAP_ALLOWED_GROUPS" in environ:
-            LDAP_ALLOWED_GROUPS = environ["LDAP_ALLOWED_GROUPS"]
+        elif "LDAP_ALLOWED_GROUPS" in os.environ:
+            LDAP_ALLOWED_GROUPS = os.environ["LDAP_ALLOWED_GROUPS"]
 
         # The default is "and", another option is "or"
         LDAP_ALLOWED_GROUPS_CONDITIONAL = "and"
         if "Ldap-Allowed-Groups-Conditional" in request.headers:
             LDAP_ALLOWED_GROUPS_CONDITIONAL = request.headers["Ldap-Allowed-Groups-Conditional"]
-        elif "LDAP_ALLOWED_GROUPS_CONDITIONAL" in environ:
-            LDAP_ALLOWED_GROUPS_CONDITIONAL = environ["LDAP_ALLOWED_GROUPS_CONDITIONAL"]
+        elif "LDAP_ALLOWED_GROUPS_CONDITIONAL" in os.environ:
+            LDAP_ALLOWED_GROUPS_CONDITIONAL = os.environ["LDAP_ALLOWED_GROUPS_CONDITIONAL"]
 
         # The default is "enabled", another option is "disabled"
         LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = True
         if "Ldap-Allowed-Groups-Case-Sensitive" in request.headers:
             LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = request.headers["Ldap-Allowed-Groups-Case-Sensitive"] == "enabled"
-        elif "LDAP_ALLOWED_GROUPS_CASE_SENSITIVE" in environ:
-            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = environ["LDAP_ALLOWED_GROUPS_CASE_SENSITIVE"] == "enabled"
+        elif "LDAP_ALLOWED_GROUPS_CASE_SENSITIVE" in os.environ:
+            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = os.environ["LDAP_ALLOWED_GROUPS_CASE_SENSITIVE"] == "enabled"
 
         # List of users separated by comma
         LDAP_ALLOWED_USERS = ""
         if "Ldap-Allowed-Users" in request.headers:
             LDAP_ALLOWED_USERS = request.headers["Ldap-Allowed-Users"]
-        elif "LDAP_ALLOWED_USERS" in environ:
-            LDAP_ALLOWED_USERS = environ["LDAP_ALLOWED_USERS"]
+        elif "LDAP_ALLOWED_USERS" in os.environ:
+            LDAP_ALLOWED_USERS = os.environ["LDAP_ALLOWED_USERS"]
 
         # The default is "or", another option is "and"
         LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = "or"
         if "Ldap-Allowed-Groups-Users-Conditional" in request.headers:
             LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = request.headers["Ldap-Allowed-Groups-Users-Conditional"]
-        elif "LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL" in environ:
-            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = environ["LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL"]
+        elif "LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL" in os.environ:
+            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = os.environ["LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL"]
         if LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL not in ["or", "and"]:
             logs.error(
                 {
@@ -200,8 +219,8 @@ def login(username, password):
         LDAP_BIND_DN = "{username}"
         if "Ldap-Bind-DN" in request.headers:
             LDAP_BIND_DN = request.headers["Ldap-Bind-DN"]
-        elif "LDAP_BIND_DN" in environ:
-            LDAP_BIND_DN = environ["LDAP_BIND_DN"]
+        elif "LDAP_BIND_DN" in os.environ:
+            LDAP_BIND_DN = os.environ["LDAP_BIND_DN"]
     except KeyError as e:
         logs.error({"message": f"Invalid parameters. {e}"})
         return False
@@ -329,8 +348,15 @@ if __name__ == "__main__":
             "bind": f"0.0.0.0:{PORT}",
             "workers": NUMBER_OF_WORKERS,
             "threads": 1,
-            "timeout": 5,
+            "timeout": 5
         }
+
+        if RELOAD_ENABLED and RELOAD_EXTRA_FILES:
+            options.update({
+                "reload": True,
+                "reload_extra_files": RELOAD_EXTRA_FILES
+            })
+
         if TLS_ENABLED:
             options["certfile"] = TLS_CERT_FILE  # pylint: disable=possibly-used-before-assignment
         if TLS_ENABLED:
