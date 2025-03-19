@@ -51,6 +51,8 @@ server:
   bruteForceExpiration: 10
   # -- Block after number failures
   bruteForceFailures: 3
+  # -- Enable automatic reload if the certificates where updated
+  reloadEnabled: false
 
 ldap:
   # -- Use an existing secret for the `managerDnUsername` password
