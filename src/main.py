@@ -49,12 +49,9 @@ if "USE_WSGI_SERVER" in os.environ and os.environ["USE_WSGI_SERVER"].lower() in 
 
 # Enable or disable reload API
 RELOAD_ENABLED = False
+RELOAD_EXTRA_FILES = []
 if "RELOAD_ENABLED" in os.environ and os.environ["RELOAD_ENABLED"].lower() in ("1", "true", "y", "yes", "on"):
     RELOAD_ENABLED = True
-
-RELOAD_EXTRA_FILES = []
-if "RELOAD_EXTRA_FILES" in os.environ and os.environ["RELOAD_EXTRA_FILES"]:
-    RELOAD_EXTRA_FILES = os.environ["RELOAD_EXTRA_FILES"].split(',')
 
 # Enable or disable TLS self-signed certificate without WSGI server
 TLS_ENABLED = False
@@ -353,14 +350,16 @@ if __name__ == "__main__":
 
         if RELOAD_ENABLED and RELOAD_EXTRA_FILES:
             options.update({
+                "preload_app": False,
                 "reload": True,
+                # hard coded to poll because of inotify problems with NFS
+                "reload_engine": "poll",
                 "reload_extra_files": RELOAD_EXTRA_FILES
             })
 
         if TLS_ENABLED:
-            options["certfile"] = TLS_CERT_FILE  # pylint: disable=possibly-used-before-assignment
-        if TLS_ENABLED:
             options["keyfile"] = TLS_KEY_FILE  # pylint: disable=possibly-used-before-assignment
+            options["certfile"] = TLS_CERT_FILE  # pylint: disable=possibly-used-before-assignment
         if TLS_ENABLED and TLS_CA_CERT_FILE:  # pylint: disable=possibly-used-before-assignment
             options["ca_certs"] = TLS_CA_CERT_FILE
 
