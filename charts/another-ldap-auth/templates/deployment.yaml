@@ -92,6 +92,8 @@ spec:
               value: "{{ .Values.server.bruteForceExpiration }}"
             - name: BRUTE_FORCE_FAILURES
               value: "{{ .Values.server.bruteForceFailures }}"
+            - name: RELOAD_ENABLED
+              value: "{{ .Values.server.reloadEnabled }}"
           ports:
             - containerPort: {{ .Values.service.containerPort }}
               protocol: {{ .Values.service.protocol }}

@@ -8,7 +8,7 @@ image:
   # -- Image pull policy
   pullPolicy: IfNotPresent
   # -- Image tag to use
-  tag: "3.2.3"
+  tag: ""
 
 # -- Specify docker-registry secret names as an array
 imagePullSecrets: []
@@ -51,6 +51,8 @@ server:
   bruteForceExpiration: 10
   # -- Block after number failures
   bruteForceFailures: 3
+  # -- Enable automatic reload if certificates where updated
+  reloadEnabled: false
 
 ldap:
   # -- Use an existing secret for the `managerDnUsername` password
