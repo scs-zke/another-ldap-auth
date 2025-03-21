@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.4](https://img.shields.io/badge/AppVersion-3.2.4-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.3.0](https://img.shields.io/badge/AppVersion-3.3.0-informational?style=flat-square)
 
 Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -24,7 +24,7 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | fullnameOverride | string | `""` | String to fully override rabbitmq.fullname template |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | image.repository | string | `"jgkirschbaum/another-ldap-auth"` | Path to the image |
-| image.tag | string | `"3.2.3"` | Image tag to use |
+| image.tag | string | `""` | Image tag to use |
 | imagePullSecrets | list | `[]` | Specify docker-registry secret names as an array |
 | ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |
 | ldap.cacheExpiration | int | `15` | Cache expiration in minutes |
@@ -52,6 +52,7 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | server.logFormat | string | `"TEXT"` | Logformat of the server: `TEXT` or `JSON` |
 | server.logLevel | string | `"INFO"` | Loglevel of the server: `INFO`, `WARNING`, `ERROR`, `DEBUG` |
 | server.numberOfWorkers | int | `1` | Number of worker processes for the [Gunicorn](https://gunicorn.org/) WSGI Server Should not be changed, due to caching is done on a per process basis Only use it in very heavy loaded environments |
+| server.reloadEnabled | bool | `false` | Enable automatic reload if certificates where updated |
 | server.tlsCaCert | string | `""` | Server ca certificates |
 | server.tlsCert | string | `""` | Server certificate |
 | server.tlsEnabled | bool | `false` | Enable TLS for the pod. If `useWsgiServer` is `true` you also need the `tlsKey` and `tlsCert`.  If `useWsgiServer` is `false` you need not to specify `tlsKey` and `tlsCert` and use the on the fly generated key and certificate |
