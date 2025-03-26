@@ -13,11 +13,11 @@ RUN apk --update --no-cache upgrade && \
     pip install --upgrade --no-cache-dir -r /tmp/requirements.txt
 
 # Run as non-root
-ENV USER aldap
-ENV UID 10001
-ENV GROUP aldap
-ENV GID 10001
-ENV HOME /home/$USER
+ENV USER=aldap
+ENV UID=10001
+ENV GROUP=aldap
+ENV GID=10001
+ENV HOME=/home/$USER
 RUN addgroup -g $GID -S $GROUP && adduser -u $UID -S $USER -G $GROUP
 
 # Python code
