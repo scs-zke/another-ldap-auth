@@ -381,10 +381,10 @@ if __name__ == "__main__":
             options.update({
                 "preload_app": False,
                 "reload": True,
-                "reload_extra_files": RELOAD_EXTRA_FILES,
                 # hard coded to poll2, our slightly improved version of Reloader
                 # because of inotify problems with NFS and we need to follow links in case of mounted secrets/configmaps in kubernetes
-                "reload_engine" : "poll2"
+                "reload_engine" : "poll2",
+                "reload_extra_files": RELOAD_EXTRA_FILES
             })
 
         if TLS_ENABLED:
