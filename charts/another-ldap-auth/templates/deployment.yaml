@@ -113,7 +113,7 @@ spec:
             initialDelaySeconds: 3
           {{- if or .Values.server.tlsEnabled .Values.ldap.tlsCaCert }}
           volumeMounts:
-            {{- if or .Values.server.tlsEnabled }}
+            {{- if .Values.server.tlsEnabled }}
             - name: another-ldap-auth-tls
               mountPath: /etc/ssl/private/tls
               readOnly: true
@@ -135,7 +135,7 @@ spec:
             secretName: {{ .Values.server.existingSecret }}
           {{- end }}
         {{- end }}
-        {{- if .Values.ldap.tlsCaCert }}
+        {{- if or .Values.ldap.tlsCaCert .Values.ldap.existingCaSecret }}
         - name: another-ldap-auth-tls-ldap
           secret:
           {{- if not .Values.ldap.existingCaSecret }}

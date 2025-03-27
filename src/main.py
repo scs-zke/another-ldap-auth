@@ -9,7 +9,9 @@ from flask import Flask
 from flask import request
 from flask import g
 from flask_httpauth import HTTPBasicAuth
+
 import gunicorn.app.base
+import gunicorn.reloader
 
 from aldap import Aldap
 from bruteforce import BruteForce
@@ -100,6 +102,32 @@ if "PORT" in os.environ:
 
 
 # --- Functions ---------------------------------------------------------------
+class UpdatedReloader(gunicorn.reloader.Reloader):
+
+    def __init__(self, extra_files=None, interval=10, callback=None):
+        super().__init__(extra_files, interval, callback)
+
+    def get_files(self):
+
+        def check_n_follow_link(fname, max_recursion = 10):
+            r = max_recursion
+            fn = fname
+
+            if not os.path.islink(fn):
+                return fn
+
+            while r > 0:
+                r -= 1
+                fn = os.readlink(fn)
+
+                if not os.path.islink(fn):
+                    return fn
+
+            raise Exception(f"Too many recursions. Can't follow linked file '{fname}'.")
+
+        return [check_n_follow_link(fn) for fn in self._extra_files]
+
+
 def cleanMatchingUsers(item: str):
     item = item.strip()
     item = item.lower()
@@ -352,10 +380,13 @@ if __name__ == "__main__":
             options.update({
                 "preload_app": False,
                 "reload": True,
-                # hard coded to poll because of inotify problems with NFS
-                "reload_engine": "poll",
+                # hard coded to poll2, our slightly improved version of Reloader
+                # because of inotify problems with NFS and
+                # we need to follow links in case of mounted secrets/configmaps in kubernetes
+                "reload_engine" : "poll2",
                 "reload_extra_files": RELOAD_EXTRA_FILES
             })
+            gunicorn.reloader.reloader_engines["poll2"] = UpdatedReloader
 
         if TLS_ENABLED:
             options["keyfile"] = TLS_KEY_FILE  # pylint: disable=possibly-used-before-assignment
