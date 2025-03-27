@@ -104,10 +104,13 @@ if "PORT" in os.environ:
 # --- Functions ---------------------------------------------------------------
 class UpdatedReloader(gunicorn.reloader.Reloader):
 
+    def __init__(self, extra_files=None, interval=10, callback=None):
+        super().__init__(extra_files, interval, callback)
+
     def get_files(self):
 
         def check_n_follow_link(fname, max_recursion = 10):
-            r = max_cursions
+            r = max_recursion
             fn = fname
 
             if not os.path.islink(fn):
@@ -122,11 +125,7 @@ class UpdatedReloader(gunicorn.reloader.Reloader):
 
             raise Exception(f"Too many recursions. Can't follow linked file '{fname}'.")
 
-
-        return [check_n_follow_link(fn) for fn in super().get_files()]
-
-
-gunicorn.reloader.reloader_engines["poll2"] = UpdatedReloader
+        return [check_n_follow_link(fn) for fn in self._extra_files]
 
 
 def cleanMatchingUsers(item: str):
@@ -382,10 +381,12 @@ if __name__ == "__main__":
                 "preload_app": False,
                 "reload": True,
                 # hard coded to poll2, our slightly improved version of Reloader
-                # because of inotify problems with NFS and we need to follow links in case of mounted secrets/configmaps in kubernetes
+                # because of inotify problems with NFS and
+                # we need to follow links in case of mounted secrets/configmaps in kubernetes
                 "reload_engine" : "poll2",
                 "reload_extra_files": RELOAD_EXTRA_FILES
             })
+            gunicorn.reloader.reloader_engines["poll2"] = UpdatedReloader
 
         if TLS_ENABLED:
             options["keyfile"] = TLS_KEY_FILE  # pylint: disable=possibly-used-before-assignment
