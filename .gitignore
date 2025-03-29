@@ -1,9 +1,14 @@
-src/__pycache__
+# Test Handling
+test*
+!tests/
+!tests/**
+
+# Ignore List
+__pycache__/
 .vscode
 export.sh
 pullsecret.yaml
 deploy.sh
-test*
 *.crt
 *.key
 *.pem
