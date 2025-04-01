@@ -23,7 +23,7 @@ jobs:
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           format: sarif
-          output:  ${{ env.SARIF_FILE }}
+          output: ${{ env.SARIF_FILE }}
           # severity: CRITICAL,HIGH
 
       - name: Upload Trivy scan results to GitHub Security tab
