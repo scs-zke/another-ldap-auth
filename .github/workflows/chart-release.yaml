@@ -1,5 +1,10 @@
 name: Release Helm Charts
 
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+
 on:
   workflow_dispatch:
   push:

@@ -1,5 +1,9 @@
 name: Scan Docker Image
 
+permissions:
+  contents: read
+  security-events: write
+
 on:
   workflow_dispatch:
   schedule:
