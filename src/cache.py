@@ -21,7 +21,7 @@ class Cache:
         """
         Returns a hash from a string
         """
-        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+        return hashlib.blake2b(text.encode("utf-8")).hexdigest()
 
     def settings(self, groupCaseSensitive: bool, groupConditional: str):
         """
