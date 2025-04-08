@@ -7,6 +7,8 @@ from itertools import repeat
 from logs import Logs
 
 
+STATIC_SALT = b"h-p@<B:q3U'h7Fqw_o}o//^7B5wOVG'RI6#2*7hrXpdL=CpqTZfDTbfPYh&)_7_X"
+
 class Cache:
     def __init__(self, expirationMinutes: int):
         self.expirationMinutes = expirationMinutes
@@ -21,7 +23,7 @@ class Cache:
         """
         Returns a hash from a string
         """
-        return hashlib.blake2b(text.encode("utf-8")).hexdigest()
+        return hashlib.scrypt(text.encode("utf-8"), salt=STATIC_SALT, n=16384, r=8, p=1).hex()
 
     def settings(self, groupCaseSensitive: bool, groupConditional: str):
         """
