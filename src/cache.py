@@ -1,13 +1,12 @@
 # pylint: disable=missing-docstring
 
-import hashlib
 import re
 from datetime import datetime, timedelta
 from itertools import repeat
 from logs import Logs
+from argon2 import PasswordHasher, Type
+from argon2.exceptions import VerifyMismatchError
 
-
-STATIC_SALT = b"h-p@<B:q3U'h7Fqw_o}o//^7B5wOVG'RI6#2*7hrXpdL=CpqTZfDTbfPYh&)_7_X"
 
 class Cache:
     def __init__(self, expirationMinutes: int):
@@ -16,14 +15,9 @@ class Cache:
         self.validUntil = datetime.now() + timedelta(minutes=self.expirationMinutes)
         self.groupCaseSensitive = True
         self.groupConditional = "and"
+        self.passwordHasher = PasswordHasher(type=Type.D)
 
         self.logs = Logs(self.__class__.__name__)
-
-    def __hash__(self, text: str) -> str:  # pylint: disable=invalid-hash-returned, unexpected-special-method-signature
-        """
-        Returns a hash from a string
-        """
-        return hashlib.scrypt(text.encode("utf-8"), salt=STATIC_SALT, n=16384, r=8, p=1).hex()
 
     def settings(self, groupCaseSensitive: bool, groupConditional: str):
         """
@@ -38,7 +32,7 @@ class Cache:
         """
         if username not in self.cache:
             self.logs.info({"message": "Adding user to the cache.", "username": username})
-            passwordHash = self.__hash__(password)  # pylint: disable=unnecessary-dunder-call
+            passwordHash = self.passwordHasher.hash(password)
             self.cache[username] = {"password": passwordHash, "adGroups": []}
 
     def addGroups(self, username: str, adGroups: list):
@@ -62,16 +56,17 @@ class Cache:
 
         if username in self.cache:
             self.logs.info({"message": "Validating user via cache.", "username": username})
-            passwordHash = self.__hash__(password)  # pylint: disable=unnecessary-dunder-call
-            if passwordHash == self.cache[username]["password"]:
-                self.logs.info(
-                    {
-                        "message": "Username and password validated by cache.",
-                        "username": username,
-                    }
-                )
-                return True
-            else:
+            try:
+                if self.passwordHasher.verify(self.cache[username]["password"], password):
+                    self.logs.info(
+                        {
+                            "message": "Username and password validated by cache.",
+                            "username": username,
+                        }
+                    )
+                    return True
+                raise VerifyMismatchError
+            except VerifyMismatchError:
                 self.logs.warning(
                     {
                         "message": "Invalid password from cache, invalidating cache.",
