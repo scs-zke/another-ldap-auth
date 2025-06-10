@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timedelta
 from itertools import repeat
 from logs import Logs
-from argon2 import PasswordHasher, Type
+from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 
@@ -15,7 +15,7 @@ class Cache:
         self.validUntil = datetime.now() + timedelta(minutes=self.expirationMinutes)
         self.groupCaseSensitive = True
         self.groupConditional = "and"
-        self.passwordHasher = PasswordHasher(type=Type.D)
+        self.passwordHasher = PasswordHasher()
 
         self.logs = Logs(self.__class__.__name__)
 
