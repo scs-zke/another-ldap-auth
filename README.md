@@ -8,12 +8,10 @@ __Another LDAP Authentication__ is an implementation of the `ldap-auth-daemon` s
 
 __Another LDAP Authentication__ is prepared to run inside a Docker container, also you can run the Python script without the Docker container.
 
-[![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue.svg)](https://hub.docker.com/r/jgkirschbaum/another-ldap-auth)
-[![Helm Chart](https://img.shields.io/badge/Helm-Chart-informational?style=flat-square)](https://github.com/jgkirschbaum/another-ldap-auth/tree/gh-pages)
-[![Kubernetes YAML manifests](https://img.shields.io/badge/Kubernetes-Manifests-blue.svg)](https://github.com/jgkirschbaum/another-ldap-auth/tree/main/kubernetes)
-[![codebeat badge](https://codebeat.co/badges/30de967a-57ad-4769-8fb9-7e1b007a91e5)](https://codebeat.co/projects/github-com-jgkirschbaum-another-ldap-auth-main)
-[![release](https://img.shields.io/github/v/release/jgkirschbaum/another-ldap-auth.svg)](https://github.com/jgkirschbaum/another-ldap-auth/releases)
-[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/jgkirschbaum/another-ldap-auth/blob/main/LICENSE)
+[![Helm Chart](https://img.shields.io/badge/Helm-Chart-informational?style=flat-square)](https://github.com/scs-zke/another-ldap-auth/tree/gh-pages)
+[![Kubernetes YAML manifests](https://img.shields.io/badge/Kubernetes-Manifests-blue.svg)](https://github.com/scs-zke/another-ldap-auth/tree/main/kubernetes)
+[![release](https://img.shields.io/github/v/release/scs-zke/another-ldap-auth.svg)](https://github.com/scs-zke/another-ldap-auth/releases)
+[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/scs-zke/another-ldap-auth/blob/main/LICENSE)
 
 ## Features
 
@@ -47,23 +45,25 @@ All values type are `string`.
 | Key | Default | Values | Description | Example |
 | --- | ------- | ------ | ----------- | ------- |
 | USE_WSGI_SERVER | `true`| `true`, `false` | Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server. | |
-| NUMBER_OF_WORKERS __(Optional)__ | `1` | _`<int>`_ | Number of workers for the Gunicorn WSGI HTTP server. Should be one because of better cache performance as every worker has its own cache.  | 2 |
+| NUMBER_OF_WORKERS | `1` | _`<int>`_ | Number of workers for the Gunicorn WSGI HTTP server. Should be one because of better cache performance as every worker has its own cache.  | 2 |
 | TLS_ENABLED | `true`| `true`, `false` | Enable or disable HTTPS support. When used without WSGI server the certificates are self signed and created automatically | |
-| TLS_KEY_FILE | `path_to_file`| | Path to the TLS key file in PEM format. | `/etc/ssl/private/tls/tls.key` |
-| TLS_CERT_FILE | `path_to_file`| | Path to the TLS certificate file in PEM format. | `/etc/ssl/private/tls/tls.crt` |
-| TLS_CA_CERT_FILE | `path_to_file`| | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/tls/ca.crt` |
-| LDAP_TLS_CA_CERT_FILE | `path_to_file`| | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/ldap/ca.crt` |
-| LDAP_ENDPOINT | | | LDAP URL with the protocol and the port number. | `ldaps://ldapsever.example.org:636` |
-| LDAP_MANAGER_DN_USERNAME | | | Username to bind and search in the LDAP tree. | `CN=john,OU=administrators,DC=example,DC=org`               |
-| LDAP_MANAGER_PASSWORD | | | Password for the bind user. | `top_secret` |
-| LDAP_SEARCH_BASE | | | Base in directory tree where the search starts. | `DC=example,DC=org` |
-| LDAP_SEARCH_FILTER | | | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`. | `(sAMAccountName={username})` |
+| TLS_KEY_FILE | | | Path to the TLS key file in PEM format. | `/etc/ssl/private/tls/tls.key` |
+| TLS_CERT_FILE | | | Path to the TLS certificate file in PEM format. | `/etc/ssl/private/tls/tls.crt` |
+| TLS_CA_CERT_FILE | | | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/tls/ca.crt` |
+| LDAP_TLS_CA_CERT_FILE | | | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/ldap/ca.crt` |
+| LDAP_ENDPOINT __(required)__ | | | LDAP URL with the protocol and the port number. | `ldaps://ldapsever.example.org:636` |
+| LDAP_MANAGER_DN_USERNAME __(required)__ | | | Username to bind and search in the LDAP tree. | `CN=john,OU=administrators,DC=example,DC=org`               |
+| LDAP_MANAGER_PASSWORD __(required)__ | | | Password for the bind user. | `top_secret` |
+| LDAP_SEARCH_BASE __(required)__ | | | Base in directory tree where the search starts. | `DC=example,DC=org` |
+| LDAP_SEARCH_FILTER __(required)__ | | | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`. | `(sAMAccountName={username})` |
+| LDAP_GROUP_MEMBERSHIP_ATTRIBUTE | `memberOf` | | Ldap user attribute specifying the groups the user is a member of. | `memberof` |
 | LDAP_BIND_DN | `{username}` | | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. | `{username}@example.org` or `UID={username},OU=people,DC=example,DC=org` |
-| LDAP_ALLOWED_USERS __(Optional)__ | | | Support a list separated by commas.| `'john,jack,jeff'` |
-| LDAP_ALLOWED_GROUPS __(Optional)__ | | | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
+| LDAP_ALLOWED_USERS | | | Support a list separated by commas.| `'john,jack,jeff'` |
+| LDAP_ALLOWED_GROUPS | | | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
 | LDAP_ALLOWED_GROUPS_CONDITIONAL | `and` | `and`, `or` | Conditional to match all the groups in the list or just one of them. | `or` |
 | LDAP_ALLOWED_GROUPS_CASE_SENSITIVE | `enabled` | `enabled`, `disabled` | Enabled or disabled case sensitive groups matches. | `disabled` |
 | LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL | `or` | `and`, `or` | Conditional to match user and at least one group in the list, or one of the two | `and` |
+| NGINX_REQUIRED_CONFIG_HEADERS | `""` | | Supports a comma seperated list of configuration headers that are then required and can overwrite the configuration values set via the environment variables. | `Ldap-Allowed-Users,Ldap-Allowed-Groups` |
 | CACHE_EXPIRATION | `5` | | Cache expiration time in minutes. | `10` |
 | LOG_LEVEL | `INFO` | `INFO`, `WARNING`, `ERROR`, `DEBUG` | Logger level. | `DEBUG` |
 | LOG_FORMAT | `TEXT` | `TEXT`, `JSON` | Output format of the logger. | `JSON` |
@@ -75,7 +75,7 @@ All values type are `string`.
 
 ### HTTP request headers
 
-The variables send via HTTP headers take precedence over environment variables.
+The following HTTP headers can be set to overwrite the settings defined via environment variables. For them to be activated they have to be specified in the `NGINX_REQUIRED_CONFIG_HEADERS`. To continue using the configuration specified in the environment variables set the headers to an empty string. If the header is listed in `NGINX_REQUIRED_CONFIG_HEADERS` but not defined the auth request the request will be denied.
 
 - `Ldap-Endpoint`
 - `Ldap-Manager-Dn-Username`
@@ -83,10 +83,16 @@ The variables send via HTTP headers take precedence over environment variables.
 - `Ldap-Bind-DN`
 - `Ldap-Search-Base`
 - `Ldap-Search-Filter`
+- `Ldap-Group-Membership-Attribute`
 - `Ldap-Allowed-Users`
 - `Ldap-Allowed-Groups`
 - `Ldap-Allowed-Groups-Case-Sensitive`
 - `Ldap-Allowed-Groups-Conditional`
+
+Additionally the following two headers can be set to restrict user and group access to a subset of the users and groups defined in allowed users and allowed groups. These headers do not have to be specified in `NGINX_REQUIRED_CONFIG_HEADERS` and can always be set.
+
+- `Ldap-User-Restrictions`
+- `Ldap-Group-Restrictions`
 
 ### HTTP response headers
 
@@ -114,7 +120,7 @@ docker run -d \
     -e LOG_FORMAT='JSON' \
     -p 9000:9000 \
     --name another_ldap_auth \
-    jgkirschbaum/another-ldap-auth:latest
+    scs-zke/another-ldap-auth:latest
 ```
 
 __Another LDAP Authentication__ is now running on `http://localhost:9000/`.
@@ -174,7 +180,7 @@ Please change the environment variables from the manifest and the secret for the
 
 After you have running __Another LDAP Authentication__ in your Kubernetes cluster, you can modify the ingress manifest from the application you want to protect.
 
-You can remove the comment `#` and send headers as variables such as `Matching groups`.
+You can remove the comment `#` and send headers to configure settings as described in the HTTP Headers section.
 
 ```yaml
 ---
@@ -187,8 +193,8 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: http://another-ldap-auth.ingress-nginx:9000
 
     # nginx.ingress.kubernetes.io/auth-snippet: |
-    #   proxy_set_header Ldap-Allowed-Groups "<SOME GROUP>";
-    #   proxy_set_header Ldap-Allowed-Groups-Conditional "or";
+    #   proxy_set_header Ldap-Group-Restrictions "<some group part of LDAP_ALLOWED_GROUPS>";
+
 spec:
   rules:
   - host: demo.local
@@ -204,7 +210,7 @@ spec:
 
 ### Step 1 - Deploy to Kubernetes with Helm
 
-Deploy __Another LDAP Authentication__ with the method described under <https://github.com/jgkirschbaum/another-ldap-auth/tree/gh-pages>. All configuration is documented under <https://github.com/jgkirschbaum/another-ldap-auth/tree/main/charts/another-ldap-auth>.
+Deploy __Another LDAP Authentication__ with the method described under <https://github.com/scs-zke/another-ldap-auth/tree/gh-pages>. All configuration is documented under <https://github.com/scs-zke/another-ldap-auth/tree/main/charts/another-ldap-auth>.
 
 ### Step 2
 

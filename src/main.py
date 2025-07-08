@@ -19,10 +19,79 @@ from cache import Cache
 from logs import Logs
 
 # --- Parameters --------------------------------------------------------------
+if "LDAP_ENDPOINT" in os.environ:
+    LDAP_ENDPOINT = os.environ["LDAP_ENDPOINT"]
+else:
+    raise ValueError("LDAP_ENDPOINT must be set")
+
+if "LDAP_MANAGER_DN_USERNAME" in os.environ:
+    LDAP_MANAGER_DN_USERNAME = os.environ["LDAP_MANAGER_DN_USERNAME"]
+else:
+    raise ValueError("LDAP_MANAGER_DN_USERNAME must be set")
+
+if "LDAP_MANAGER_PASSWORD" in os.environ:
+    LDAP_MANAGER_PASSWORD = os.environ["LDAP_MANAGER_PASSWORD"]
+else:
+    raise ValueError("LDAP_MANAGER_PASSWORD must be set")
+
+if "LDAP_SEARCH_BASE" in os.environ:
+    LDAP_SEARCH_BASE = os.environ["LDAP_SEARCH_BASE"]
+else:
+    raise ValueError("LDAP_SEARCH_BASE must be set")
+
+if "LDAP_SEARCH_FILTER" in os.environ:
+    LDAP_SEARCH_FILTER = os.environ["LDAP_SEARCH_FILTER"]
+else:
+    raise ValueError("LDAP_SEARCH_FILTER must be set")
+
+# Ldap user attribute specifying the groups the user is a member of
+LDAP_GROUP_MEMBERSHIP_ATTRIBUTE = "memberOf"
+if "LDAP_GROUP_MEMBERSHIP_ATTRIBUTE" in os.environ:
+    LDAP_GROUP_MEMBERSHIP_ATTRIBUTE = os.environ["LDAP_GROUP_MEMBERSHIP_ATTRIBUTE"]
+
+# List of users separated by comma
+LDAP_ALLOWED_USERS = ""
+if "LDAP_ALLOWED_USERS" in os.environ:
+    LDAP_ALLOWED_USERS = os.environ["LDAP_ALLOWED_USERS"]
+
+# List of groups separated by comma
+LDAP_ALLOWED_GROUPS = ""
+if "LDAP_ALLOWED_GROUPS" in os.environ:
+    LDAP_ALLOWED_GROUPS = os.environ["LDAP_ALLOWED_GROUPS"]
+
+# The default is "and", another option is "or"
+LDAP_ALLOWED_GROUPS_CONDITIONAL = "and"
+if "LDAP_ALLOWED_GROUPS_CONDITIONAL" in os.environ:
+    LDAP_ALLOWED_GROUPS_CONDITIONAL = os.environ["LDAP_ALLOWED_GROUPS_CONDITIONAL"]
+if LDAP_ALLOWED_GROUPS_CONDITIONAL not in ["or", "and"]:
+    raise ValueError(f"LDAP_ALLOWED_GROUPS_CONDITIONAL '{LDAP_ALLOWED_GROUPS_CONDITIONAL}' not allowed")
+
+# The default is "enabled", another option is "disabled"
+LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = True
+if "LDAP_ALLOWED_GROUPS_CASE_SENSITIVE" in os.environ:
+    LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = os.environ["LDAP_ALLOWED_GROUPS_CASE_SENSITIVE"] == "enabled"
+
+# The default is "or", another option is "and"
+LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = "or"
+if "LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL" in os.environ:
+    LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = os.environ["LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL"]
+if LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL not in ["or", "and"]:
+    raise ValueError(f"LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL '{LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL}' not allowed")
+
+# Bind DN for the LDAP connection, supports variable expansion for {username}
+LDAP_BIND_DN = "{username}"
+if "LDAP_BIND_DN" in os.environ:
+    LDAP_BIND_DN = os.environ["LDAP_BIND_DN"]
+
+# List of required configuration headers separated by comma
+NGINX_REQUIRED_CONFIG_HEADERS = ""
+if "NGINX_REQUIRED_CONFIG_HEADERS" in os.environ:
+    NGINX_REQUIRED_CONFIG_HEADERS = os.environ["NGINX_REQUIRED_CONFIG_HEADERS"]
+
 # Key for encrypt the Session
-FLASK_SECRET_KEY = "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(64)).encode('utf8')
+FLASK_SECRET_KEY = "".join(secrets.choice(string.ascii_letters + string.digits) for i in range(64)).encode("utf8")
 if "FLASK_SECRET_KEY" in os.environ:
-    FLASK_SECRET_KEY = str(os.environ["FLASK_SECRET_KEY"]).encode('utf8')
+    FLASK_SECRET_KEY = str(os.environ["FLASK_SECRET_KEY"]).encode("utf8")
 
 # Cache expiration in minutes
 CACHE_EXPIRATION = 5
@@ -109,7 +178,7 @@ class UpdatedReloader(gunicorn.reloader.Reloader):
 
     def get_files(self):
 
-        def check_n_follow_link(fname, max_recursion = 10):
+        def check_n_follow_link(fname, max_recursion=10):
             r = max_recursion
             fn = fname
 
@@ -171,98 +240,171 @@ def login(username, password):
     if bruteForce.isIpBlocked():
         return False
 
+    # Get configuration from request headers
     try:
-        if "Ldap-Endpoint" in request.headers:
-            LDAP_ENDPOINT = request.headers.get("Ldap-Endpoint")
-        else:
-            LDAP_ENDPOINT = os.environ["LDAP_ENDPOINT"]
+        ldap_endpoint = LDAP_ENDPOINT
+        if "Ldap-Endpoint" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Endpoint" in request.headers:
+                if request.headers["Ldap-Endpoint"] != "":
+                    ldap_endpoint = request.headers["Ldap-Endpoint"]
+            else:
+                logs.error({"message": "Ldap-Endpoint header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        if "Ldap-Manager-Dn-Username" in request.headers:
-            LDAP_MANAGER_DN_USERNAME = request.headers["Ldap-Manager-Dn-Username"]
-        else:
-            LDAP_MANAGER_DN_USERNAME = os.environ["LDAP_MANAGER_DN_USERNAME"]
+        ldap_manager_dn_username = LDAP_MANAGER_DN_USERNAME
+        if "Ldap-Manager-Dn-Username" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Manager-Dn-Username" in request.headers:
+                if request.headers["Ldap-Manager-Dn-Username"] != "":
+                    ldap_manager_dn_username = request.headers["Ldap-Manager-Dn-Username"]
+            else:
+                logs.error({"message": "Ldap-Manager-Dn-Username header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        if "Ldap-Manager-Password" in request.headers:
-            LDAP_MANAGER_PASSWORD = request.headers["Ldap-Manager-Password"]
-        else:
-            LDAP_MANAGER_PASSWORD = os.environ["LDAP_MANAGER_PASSWORD"]
+        ldap_manager_password = LDAP_MANAGER_PASSWORD
+        if "Ldap-Manager-Password" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Manager-Password" in request.headers:
+                if request.headers["Ldap-Manager-Password"] != "":
+                    ldap_manager_password = request.headers["Ldap-Manager-Password"]
+            else:
+                logs.error({"message": "Ldap-Manager-Password header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        if "Ldap-Search-Base" in request.headers:
-            LDAP_SEARCH_BASE = request.headers["Ldap-Search-Base"]
-        else:
-            LDAP_SEARCH_BASE = os.environ["LDAP_SEARCH_BASE"]
+        ldap_bind_dn = LDAP_BIND_DN
+        if "Ldap-Bind-DN" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Bind-DN" in request.headers:
+                if request.headers["Ldap-Bind-DN"] != "":
+                    ldap_bind_dn = request.headers["Ldap-Bind-DN"]
+            else:
+                logs.error({"message": "Ldap-Bind-DN header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        if "Ldap-Search-Filter" in request.headers:
-            LDAP_SEARCH_FILTER = request.headers["Ldap-Search-Filter"]
-        else:
-            LDAP_SEARCH_FILTER = os.environ["LDAP_SEARCH_FILTER"]
+        ldap_search_base = LDAP_SEARCH_BASE
+        if "Ldap-Search-Base" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Search-Base" in request.headers:
+                if request.headers["Ldap-Search-Base"] != "":
+                    ldap_search_base = request.headers["Ldap-Search-Base"]
+            else:
+                logs.error({"message": "Ldap-Search-Base header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        # List of groups separated by comma
-        LDAP_ALLOWED_GROUPS = ""
-        if "Ldap-Allowed-Groups" in request.headers:
-            LDAP_ALLOWED_GROUPS = request.headers["Ldap-Allowed-Groups"]
-        elif "LDAP_ALLOWED_GROUPS" in os.environ:
-            LDAP_ALLOWED_GROUPS = os.environ["LDAP_ALLOWED_GROUPS"]
+        ldap_search_filter = LDAP_SEARCH_FILTER
+        if "Ldap-Search-Filter" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Search-Filter" in request.headers:
+                if request.headers["Ldap-Search-Filter"] != "":
+                    ldap_search_filter = request.headers["Ldap-Search-Filter"]
+            else:
+                logs.error({"message": "Ldap-Search-Filter header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        # The default is "and", another option is "or"
-        LDAP_ALLOWED_GROUPS_CONDITIONAL = "and"
-        if "Ldap-Allowed-Groups-Conditional" in request.headers:
-            LDAP_ALLOWED_GROUPS_CONDITIONAL = request.headers["Ldap-Allowed-Groups-Conditional"]
-        elif "LDAP_ALLOWED_GROUPS_CONDITIONAL" in os.environ:
-            LDAP_ALLOWED_GROUPS_CONDITIONAL = os.environ["LDAP_ALLOWED_GROUPS_CONDITIONAL"]
+        ldap_group_membership_attribute = LDAP_GROUP_MEMBERSHIP_ATTRIBUTE
+        if "Ldap-Group-Membership-Attribute" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Group-Membership-Attribute" in request.headers:
+                if request.headers["Ldap-Group-Membership-Attribute"] != "":
+                    ldap_group_membership_attribute = request.headers["Ldap-Group-Membership-Attribute"]
+            else:
+                logs.error({"message": "Ldap-Group-Membership-Attribute header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        # The default is "enabled", another option is "disabled"
-        LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = True
-        if "Ldap-Allowed-Groups-Case-Sensitive" in request.headers:
-            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = request.headers["Ldap-Allowed-Groups-Case-Sensitive"] == "enabled"
-        elif "LDAP_ALLOWED_GROUPS_CASE_SENSITIVE" in os.environ:
-            LDAP_ALLOWED_GROUPS_CASE_SENSITIVE = os.environ["LDAP_ALLOWED_GROUPS_CASE_SENSITIVE"] == "enabled"
+        ldap_allowed_users = LDAP_ALLOWED_USERS
+        if "Ldap-Allowed-Users" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Allowed-Users" in request.headers:
+                if request.headers["Ldap-Allowed-Users"] != "":
+                    ldap_allowed_users = request.headers["Ldap-Allowed-Users"]
+            else:
+                logs.error({"message": "Ldap-Allowed-Users header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        # List of users separated by comma
-        LDAP_ALLOWED_USERS = ""
-        if "Ldap-Allowed-Users" in request.headers:
-            LDAP_ALLOWED_USERS = request.headers["Ldap-Allowed-Users"]
-        elif "LDAP_ALLOWED_USERS" in os.environ:
-            LDAP_ALLOWED_USERS = os.environ["LDAP_ALLOWED_USERS"]
+        ldap_allowed_groups = LDAP_ALLOWED_GROUPS
+        if "Ldap-Allowed-Groups" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Allowed-Groups" in request.headers:
+                if request.headers["Ldap-Allowed-Groups"] != "":
+                    ldap_allowed_groups = request.headers["Ldap-Allowed-Groups"]
+            else:
+                logs.error({"message": "Ldap-Allowed-Groups header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
 
-        # The default is "or", another option is "and"
-        LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = "or"
-        if "Ldap-Allowed-Groups-Users-Conditional" in request.headers:
-            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = request.headers["Ldap-Allowed-Groups-Users-Conditional"]
-        elif "LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL" in os.environ:
-            LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL = os.environ["LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL"]
-        if LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL not in ["or", "and"]:
-            logs.error(
-                {
-                    "message": "Invalid conditional for groups and user matching.",
-                    "username": username,
-                    "conditional": LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL,
-                }
-            )
-            return False
+        ldap_allowed_groups_case_sensitive = LDAP_ALLOWED_GROUPS_CASE_SENSITIVE
+        if "Ldap-Allowed-Groups-Case-Sensitive" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Allowed-Groups-Case-Sensitive" in request.headers:
+                if request.headers["Ldap-Allowed-Groups-Case-Sensitive"] != "":
+                    ldap_allowed_groups_case_sensitive = request.headers["Ldap-Allowed-Groups-Case-Sensitive"] == "enabled"
+            else:
+                logs.error(
+                    {"message": "Ldap-Allowed-Groups-Case-Sensitive header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."}
+                )
+                return False
 
-        LDAP_BIND_DN = "{username}"
-        if "Ldap-Bind-DN" in request.headers:
-            LDAP_BIND_DN = request.headers["Ldap-Bind-DN"]
-        elif "LDAP_BIND_DN" in os.environ:
-            LDAP_BIND_DN = os.environ["LDAP_BIND_DN"]
+        ldap_allowed_groups_conditional = LDAP_ALLOWED_GROUPS_CONDITIONAL
+        if "Ldap-Allowed-Groups-Conditional" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Allowed-Groups-Conditional" in request.headers:
+                if request.headers["Ldap-Allowed-Groups-Conditional"] != "":
+                    ldap_allowed_groups_conditional = request.headers["Ldap-Allowed-Groups-Conditional"]
+                if ldap_allowed_groups_conditional not in ["and", "or"]:
+                    logs.error(
+                        {
+                            "message": "Invalid conditional for groups matching.",
+                            "username": username,
+                            "conditional": ldap_allowed_groups_conditional,
+                        }
+                    )
+                    return False
+            else:
+                logs.error({"message": "Ldap-Allowed-Groups-Conditional header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."})
+                return False
+
+        ldap_allowed_groups_users_conditional = LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL
+        if "Ldap-Allowed-Groups-Users-Conditional" in NGINX_REQUIRED_CONFIG_HEADERS.split(","):
+            if "Ldap-Allowed-Groups-Users-Conditional" in request.headers:
+                if request.headers["Ldap-Allowed-Groups-Users-Conditional"] != "":
+                    ldap_allowed_groups_users_conditional = request.headers["Ldap-Allowed-Groups-Users-Conditional"]
+                if ldap_allowed_groups_users_conditional not in ["or", "and"]:
+                    logs.error(
+                        {
+                            "message": "Invalid conditional for groups and user matching.",
+                            "username": username,
+                            "conditional": ldap_allowed_groups_users_conditional,
+                        }
+                    )
+                    return False
+            else:
+                logs.error(
+                    {"message": "Ldap-Allowed-Groups-Users-Conditional header specified in NGINX_REQUIRED_CONFIG_HEADERS but not recieved in auth request."}
+                )
+                return False
+
+        # Restrict users and groups if restriction headers are set
+        if "Ldap-User-Restrictions" in request.headers:
+            restricted_users = set(request.headers["Ldap-User-Restrictions"].split(","))
+            allowed_users = set(ldap_allowed_users.split(","))
+            ldap_allowed_users = ",".join(list(allowed_users.intersection(restricted_users)))
+
+        if "Ldap-Group-Restrictions" in request.headers:
+            restricted_groups = set(request.headers["Ldap-Group-Restrictions"].split(","))
+            allowed_groups = set(ldap_allowed_groups.split(","))
+            ldap_allowed_groups = ",".join(list(allowed_groups.intersection(restricted_groups)))
+
     except KeyError as e:
         logs.error({"message": f"Invalid parameters. {e}"})
         return False
 
+    if not ldap_allowed_users and not ldap_allowed_groups:
+        logs.error({"message": "Neither LDAP_ALLOWED_USERS nor LDAP_ALLOWED_GROUPS has been specified. Unable to authenticate any users."})
+        return False
+
     aldap = Aldap(
-        LDAP_ENDPOINT,
-        LDAP_MANAGER_DN_USERNAME,
-        LDAP_MANAGER_PASSWORD,
-        LDAP_BIND_DN,
-        LDAP_SEARCH_BASE,
-        LDAP_SEARCH_FILTER,
-        LDAP_ALLOWED_GROUPS_CASE_SENSITIVE,
-        LDAP_ALLOWED_GROUPS_CONDITIONAL,
+        ldap_endpoint,
+        ldap_manager_dn_username,
+        ldap_manager_password,
+        ldap_bind_dn,
+        ldap_search_base,
+        ldap_search_filter,
+        ldap_group_membership_attribute,
+        ldap_allowed_groups_case_sensitive,
+        ldap_allowed_groups_conditional,
         LDAP_TLS_CA_CERT_FILE,
     )
 
-    cache.settings(LDAP_ALLOWED_GROUPS_CASE_SENSITIVE, LDAP_ALLOWED_GROUPS_CONDITIONAL)
+    cache.settings(ldap_allowed_groups_case_sensitive, ldap_allowed_groups_conditional)
 
     # Check if the username and password are valid
     # First check inside the cache and then in the LDAP server
@@ -274,8 +416,8 @@ def login(username, password):
             return False
 
     # Validate user via matching users
-    if LDAP_ALLOWED_USERS:
-        matchingUsers = LDAP_ALLOWED_USERS.split(",")  # Convert string to list
+    if ldap_allowed_users:
+        matchingUsers = ldap_allowed_users.split(",")  # Convert string to list
         matchingUsers = list(map(cleanMatchingUsers, matchingUsers))
         if username in matchingUsers:
             logs.info(
@@ -285,10 +427,10 @@ def login(username, password):
                     "matchingUsers": ",".join(matchingUsers),
                 }
             )
-            if LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL == "or":
+            if ldap_allowed_groups_users_conditional == "or":
                 setRegister(username, [])
                 return True
-        elif not LDAP_ALLOWED_GROUPS or LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL == "and":
+        elif not ldap_allowed_groups or ldap_allowed_groups_users_conditional == "and":
             logs.info(
                 {
                     "message": "Username not found inside the allowed users list.",
@@ -300,8 +442,8 @@ def login(username, password):
 
     # Validate user via matching groups
     matchedGroups = []
-    if LDAP_ALLOWED_GROUPS:
-        matchingGroups = LDAP_ALLOWED_GROUPS.split(",")  # Convert string to list
+    if ldap_allowed_groups:
+        matchingGroups = ldap_allowed_groups.split(",")  # Convert string to list
         matchingGroups = list(map(cleanMatchingGroups, matchingGroups))
         validGroups, matchedGroups = cache.validateGroups(username, matchingGroups)
         if not validGroups:
@@ -369,23 +511,20 @@ if __name__ == "__main__":
             def load(self):
                 return self.application
 
-        options = {
-            "bind": f"0.0.0.0:{PORT}",
-            "workers": NUMBER_OF_WORKERS,
-            "threads": 1,
-            "timeout": 5
-        }
+        options = {"bind": f"0.0.0.0:{PORT}", "workers": NUMBER_OF_WORKERS, "threads": 1, "timeout": 5}
 
         if RELOAD_ENABLED and RELOAD_EXTRA_FILES:
-            options.update({
-                "preload_app": False,
-                "reload": True,
-                # hard coded to poll2, our slightly improved version of Reloader
-                # because of inotify problems with NFS and
-                # we need to follow links in case of mounted secrets/configmaps in kubernetes
-                "reload_engine" : "poll2",
-                "reload_extra_files": RELOAD_EXTRA_FILES
-            })
+            options.update(
+                {
+                    "preload_app": False,
+                    "reload": True,
+                    # hard coded to poll2, our slightly improved version of Reloader
+                    # because of inotify problems with NFS and
+                    # we need to follow links in case of mounted secrets/configmaps in kubernetes
+                    "reload_engine": "poll2",
+                    "reload_extra_files": RELOAD_EXTRA_FILES,
+                }
+            )
             gunicorn.reloader.reloader_engines["poll2"] = UpdatedReloader
 
         if TLS_ENABLED:

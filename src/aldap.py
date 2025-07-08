@@ -16,6 +16,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         bindDN,
         searchBase,
         searchFilter,
+        groupMembershipAttribute,
         groupCaseSensitive,
         groupConditional,
         ldapTlsCaCert,
@@ -26,6 +27,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         self.dnPassword = dnPassword
         self.bindDN = bindDN
         self.searchFilter = searchFilter
+        self.groupMembershipAttribute = groupMembershipAttribute
         self.groupConditional = groupConditional.lower()
         self.groupCaseSensitive = groupCaseSensitive
 
@@ -136,7 +138,7 @@ class Aldap:  # pylint: disable=too-many-instance-attributes
         for zone in tree:
             for element in zone:
                 try:
-                    adGroups.extend(element["memberOf"])
+                    adGroups.extend(element[self.groupMembershipAttribute])
                 except:  # pylint: disable=bare-except
                     pass
         # Create a list from the elements and convert binary to str the items
