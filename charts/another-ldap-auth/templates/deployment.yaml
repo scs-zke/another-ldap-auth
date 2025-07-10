@@ -103,7 +103,7 @@ spec:
             {{- end }}
             {{- end }}
             - name: NUMBER_OF_WORKERS
-              value: "{{ .Vaules.server.numberOfWorkers }}"
+              value: "{{ .Values.server.numberOfWorkers }}"
             - name: PORT
               value: "{{ .Values.service.containerPort }}"
             - name: LOG_LEVEL
