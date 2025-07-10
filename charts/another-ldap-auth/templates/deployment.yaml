@@ -69,7 +69,7 @@ spec:
             - name: LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL
               value: "{{ .Values.ldap.allowedGroupsUsersConditional }}"
             - name: LDAP_REQUIRED_CONFIG_HEADERS
-              value: "{{ .Values.nginx.requiredConfigHeaders }}"
+              value: "{{ .Values.ldap.requiredConfigHeaders }}"
             - name: LDAP_CACHE_EXPIRATION
               value: "{{ .Values.ldap.cacheExpiration }}"
             {{- if .Values.ldap.tlsCaCert }}
