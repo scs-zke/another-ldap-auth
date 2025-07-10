@@ -42,40 +42,48 @@ All values type are `string`.
 
 ### Environment variables
 
+#### LDAP Configuration
+
 | Key | Default | Values | Description | Example |
 | --- | ------- | ------ | ----------- | ------- |
-| USE_WSGI_SERVER | `true`| `true`, `false` | Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server. | |
-| NUMBER_OF_WORKERS | `1` | _`<int>`_ | Number of workers for the Gunicorn WSGI HTTP server. Should be one because of better cache performance as every worker has its own cache.  | 2 |
-| TLS_ENABLED | `true`| `true`, `false` | Enable or disable HTTPS support. When used without WSGI server the certificates are self signed and created automatically | |
-| TLS_KEY_FILE | | | Path to the TLS key file in PEM format. | `/etc/ssl/private/tls/tls.key` |
-| TLS_CERT_FILE | | | Path to the TLS certificate file in PEM format. | `/etc/ssl/private/tls/tls.crt` |
-| TLS_CA_CERT_FILE | | | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/tls/ca.crt` |
-| LDAP_TLS_CA_CERT_FILE | | | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/ldap/ca.crt` |
-| LDAP_ENDPOINT __(required)__ | | | LDAP URL with the protocol and the port number. | `ldaps://ldapsever.example.org:636` |
-| LDAP_MANAGER_DN_USERNAME __(required)__ | | | Username to bind and search in the LDAP tree. | `CN=john,OU=administrators,DC=example,DC=org`               |
-| LDAP_MANAGER_PASSWORD __(required)__ | | | Password for the bind user. | `top_secret` |
-| LDAP_SEARCH_BASE __(required)__ | | | Base in directory tree where the search starts. | `DC=example,DC=org` |
-| LDAP_SEARCH_FILTER __(required)__ | | | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`. | `(sAMAccountName={username})` |
-| LDAP_GROUP_MEMBERSHIP_ATTRIBUTE | `memberOf` | | Ldap user attribute specifying the groups the user is a member of. | `memberof` |
+| LDAP_ENDPOINT | `""` | | LDAP URL with the protocol and the port number. | `ldaps://ldapsever.example.org:636` |
+| LDAP_MANAGER_DN_USERNAME | `""` | | Username to bind and search in the LDAP tree. | `CN=john,OU=administrators,DC=example,DC=org`               |
+| LDAP_MANAGER_PASSWORD | `""` | | Password for the bind user. | `top_secret` |
+| LDAP_SEARCH_BASE | `""` | | Base in directory tree where the search starts. | `DC=example,DC=org` |
+| LDAP_SEARCH_FILTER | `(sAMAccountName={username})` | | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`. | `(sAMAccountName={username})` |
 | LDAP_BIND_DN | `{username}` | | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. | `{username}@example.org` or `UID={username},OU=people,DC=example,DC=org` |
-| LDAP_ALLOWED_USERS | | | Support a list separated by commas.| `'john,jack,jeff'` |
-| LDAP_ALLOWED_GROUPS | | | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
+| LDAP_GROUP_MEMBERSHIP_ATTRIBUTE | `memberOf` | | Ldap user attribute specifying the groups the user is a member of. | `memberof` |
+| LDAP_ALLOWED_USERS | `""` | | Support a list separated by commas.| `'john,jack,jeff'` |
+| LDAP_ALLOWED_GROUPS | `""` | | Supports regular expressions, and support a list separated by commas.| `'DevOps production environment', 'Developers .* environment'` |
 | LDAP_ALLOWED_GROUPS_CONDITIONAL | `and` | `and`, `or` | Conditional to match all the groups in the list or just one of them. | `or` |
 | LDAP_ALLOWED_GROUPS_CASE_SENSITIVE | `enabled` | `enabled`, `disabled` | Enabled or disabled case sensitive groups matches. | `disabled` |
 | LDAP_ALLOWED_GROUPS_USERS_CONDITIONAL | `or` | `and`, `or` | Conditional to match user and at least one group in the list, or one of the two | `and` |
-| NGINX_REQUIRED_CONFIG_HEADERS | `""` | | Supports a comma seperated list of configuration headers that are then required and can overwrite the configuration values set via the environment variables. | `Ldap-Allowed-Users,Ldap-Allowed-Groups` |
-| CACHE_EXPIRATION | `5` | | Cache expiration time in minutes. | `10` |
-| LOG_LEVEL | `INFO` | `INFO`, `WARNING`, `ERROR`, `DEBUG` | Logger level. | `DEBUG` |
-| LOG_FORMAT | `TEXT` | `TEXT`, `JSON` | Output format of the logger. | `JSON` |
-| BRUTE_FORCE_PROTECTION | `disabled`| `enabled`, `disabled` | Enabled or disabled Brute force protection per IP. | |
+| LDAP_REQUIRED_CONFIG_HEADERS | `""` | | Supports a comma seperated list of configuration headers that are then required and can overwrite the configuration values set via the environment variables. | `Ldap-Allowed-Users,Ldap-Allowed-Groups` |
+| LDAP_CACHE_EXPIRATION | `5` | | Cache expiration time in minutes. | `10` |
+| LDAP_TLS_CA_CERT_FILE | `None` | | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/ldap/ca.crt` |
+
+#### Server Configuration
+
+| Key | Default | Values | Description | Example |
+| --- | ------- | ------ | ----------- | ------- |
+| FLASK_SECRET_KEY | __(auto generated)__ | | Key for signing the session cookie. Usually no need to set it, but if you want to use the same key for multiple pods you can set it here. | |
+| BRUTE_FORCE_PROTECTION | `disabled` | `enabled`, `disabled` | Enabled or disabled Brute force protection per IP. | |
 | BRUTE_FORCE_EXPIRATION | `10`| | Brute force expiration time in seconds per IP. | |
 | BRUTE_FORCE_FAILURES | `3`| | Number of failures before the IP is blocked.  | |
-| FLASK_SECRET_KEY | `""`| | Key for signing the session cookie. Usually no need to set it, but if you want to use the same key for multiple pods you can set it here. | |
+| USE_WSGI_SERVER | `true`| `true`, `false` | Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server. | |
 | RELOAD_ENABLED | `false` | `true`, `false` | Enable automatic reloading of workers, when TLS certificates or other files were modified | |
+| TLS_ENABLED | `true`| `true`, `false` | Enable or disable HTTPS support. When used without WSGI server the certificates are self signed and created automatically | |
+| TLS_KEY_FILE | `None` | | Path to the TLS key file in PEM format. | `/etc/ssl/private/tls/tls.key` |
+| TLS_CERT_FILE | `None` | | Path to the TLS certificate file in PEM format. | `/etc/ssl/private/tls/tls.crt` |
+| TLS_CA_CERT_FILE | `None` | | Path to the TLS CA certificates file in PEM format. | `/etc/ssl/private/tls/ca.crt` |
+| NUMBER_OF_WORKERS | `1` | _`<int>`_ | Number of workers for the Gunicorn WSGI HTTP server. Should be one because of better cache performance as every worker has its own cache.  | 2 |
+| PORT | `9000` | _`<int>`_ | The port over which the server is exposed | |
+| LOG_LEVEL | `INFO` | `INFO`, `WARNING`, `ERROR`, `DEBUG` | Logger level. | `DEBUG` |
+| LOG_FORMAT | `TEXT` | `TEXT`, `JSON` | Output format of the logger. | `JSON` |
 
 ### HTTP request headers
 
-The following HTTP headers can be set to overwrite the settings defined via environment variables. For them to be activated they have to be specified in the `NGINX_REQUIRED_CONFIG_HEADERS`. To continue using the configuration specified in the environment variables set the headers to an empty string. If the header is listed in `NGINX_REQUIRED_CONFIG_HEADERS` but not defined the auth request the request will be denied.
+The following HTTP headers can be set to overwrite the LDAP settings defined via environment variables. For them to be activated they have to be specified in the `LDAP_REQUIRED_CONFIG_HEADERS`. To continue using the configuration specified in the environment variables set the headers to an empty string. If the header is listed in `LDAP_REQUIRED_CONFIG_HEADERS` but not defined the auth request the request will be denied.
 
 - `Ldap-Endpoint`
 - `Ldap-Manager-Dn-Username`
@@ -89,7 +97,7 @@ The following HTTP headers can be set to overwrite the settings defined via envi
 - `Ldap-Allowed-Groups-Case-Sensitive`
 - `Ldap-Allowed-Groups-Conditional`
 
-Additionally the following two headers can be set to restrict user and group access to a subset of the users and groups defined in allowed users and allowed groups. These headers do not have to be specified in `NGINX_REQUIRED_CONFIG_HEADERS` and can always be set.
+Additionally the following two headers can be set to restrict user and group access to a subset of the users and groups defined in allowed users and allowed groups. These headers do not have to be specified in `LDAP_REQUIRED_CONFIG_HEADERS` and can always be set.
 
 - `Ldap-User-Restrictions`
 - `Ldap-Group-Restrictions`

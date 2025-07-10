@@ -23,6 +23,7 @@ ENV UID=10001
 ENV GROUP=aldap
 ENV GID=10001
 ENV HOME=/home/$USER
+ENV PORT=9000
 RUN addgroup -g $GID -S $GROUP && adduser -u $UID -S $USER -G $GROUP
 
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
@@ -30,7 +31,7 @@ COPY --from=builder /app $HOME/
 
 RUN chown -R $USER:$GROUP $HOME
 
-EXPOSE 9000
+EXPOSE $PORT
 
 USER $UID:$GID
 WORKDIR $HOME

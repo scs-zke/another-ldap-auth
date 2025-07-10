@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 1.3.7](https://img.shields.io/badge/Version-1.3.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.0](https://img.shields.io/badge/AppVersion-3.6.0-informational?style=flat-square)
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: main](https://img.shields.io/badge/AppVersion-main-informational?style=flat-square)
 
 Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -26,14 +26,21 @@ Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based ba
 | image.repository | string | `"ghcr.io/scs-zke/another-ldap-auth"` | Path to the image |
 | image.tag | string | `""` | Image tag to use |
 | imagePullSecrets | list | `[]` | Specify docker-registry secret names as an array |
-| ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |
+| ldap.allowedGroups | string | `""` | List of allowed groups |
+| ldap.allowedGroupsCaseSensitive | string | `"enabled"` | Match allowed groups case sensitive |
+| ldap.allowedGroupsConditional | string | `"and"` | Conditional to match all groups or just one |
+| ldap.allowedGroupsUsersConditional | string | `"or"` | Conditional to match allowed users also with allowed groups |
+| ldap.allowedUsers | string | `""` | List of allowed users |
+| ldap.bindDN | string | `"{username}"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |
 | ldap.cacheExpiration | int | `15` | Cache expiration in minutes |
-| ldap.endpoint | string | `"ldaps://testmyldap.com:636"` | LDAP endpoint |
+| ldap.endpoint | string | `""` | LDAP endpoint |
 | ldap.existingCaSecret | string | `""` | the secret must contain `ca.crt`.  If set, `ldap.tlsCaCert` is ignored |
 | ldap.existingSecret | string | `""` | Use an existing secret for the `managerDnUsername` password |
+| ldap.groupMembershipAttribute | string | `"memberOf"` | User attribute specifying group memberships |
 | ldap.managerDnPassword | string | `nil` | Passwort for `managerDnUsername`, only used when `existingSecret` is not set |
-| ldap.managerDnUsername | string | `"CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"` | Username for LDAP bind requests |
-| ldap.searchBase | string | `"DC=TESTMYLDAP,DC=COM"` | Base in directory tree where the search starts |
+| ldap.managerDnUsername | string | `""` | Username for LDAP bind requests |
+| ldap.requiredConfigHeaders | string | `""` | List of config headers required for the configuration |
+| ldap.searchBase | string | `""` | Base in directory tree where the search starts |
 | ldap.searchFilter | string | `"(sAMAccountName={username})"` | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName` |
 | ldap.tlsCaCert | string | `""` | ca certificates for the LDAP connection |
 | nameOverride | string | `""` | String to partially override rabbitmq.fullname template (will maintain the release name) |

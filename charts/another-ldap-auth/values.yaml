@@ -17,29 +17,44 @@ nameOverride: ""
 # -- String to fully override rabbitmq.fullname template
 fullnameOverride: ""
 
-server:
-  # -- Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server
-  useWsgiServer: true
-  # -- Number of worker processes for the [Gunicorn](https://gunicorn.org/) WSGI Server
-  # Should not be changed, due to caching is done on a per process basis
-  # Only use it in very heavy loaded environments
-  numberOfWorkers: 1
-  # -- Enable TLS for the pod. If `useWsgiServer` is `true` you also need the `tlsKey` and `tlsCert`.
-  #  If `useWsgiServer` is `false` you need not to specify `tlsKey` and `tlsCert` and use the on the fly
-  # generated key and certificate
-  tlsEnabled: false
-  # -- the secret must contain tls.key, tls.crt and ca.crt. If set, `tlsKey`, `tlsCert` and `tlsCaCert` are ignored
+ldap:
+  # -- LDAP endpoint
+  endpoint: ""
+  # -- Username for LDAP bind requests
+  managerDnUsername: ""
+  # -- Passwort for `managerDnUsername`, only used when `existingSecret` is not set
+  managerDnPassword:
+  # -- Use an existing secret for the `managerDnUsername` password
   existingSecret: ""
-  # -- Server private key
-  tlsKey: ""
-  # -- Server certificate
-  tlsCert: ""
-  # -- Server ca certificates
+  # -- Base in directory tree where the search starts
+  searchBase: ""
+  # -- Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`
+  searchFilter: "(sAMAccountName={username})"
+  # -- Depends on your LDAP server the binding structure can change.
+  # This field supports variable expansion for the username.
+  bindDN: "{username}"
+  # -- User attribute specifying group memberships
+  groupMembershipAttribute: "memberOf"
+  # -- List of allowed users
+  allowedUsers: ""
+  # -- List of allowed groups
+  allowedGroups: ""
+  # -- Conditional to match all groups or just one
+  allowedGroupsConditional: "and"
+  # -- Match allowed groups case sensitive
+  allowedGroupsCaseSensitive: "enabled"
+  # -- Conditional to match allowed users also with allowed groups
+  allowedGroupsUsersConditional: "or"
+  # -- List of config headers required for the configuration
+  requiredConfigHeaders: ""
+  # -- Cache expiration in minutes
+  cacheExpiration: 15
+  # -- ca certificates for the LDAP connection
   tlsCaCert: ""
-  # -- Loglevel of the server: `INFO`, `WARNING`, `ERROR`, `DEBUG`
-  logLevel: "INFO"
-  # -- Logformat of the server: `TEXT` or `JSON`
-  logFormat: "TEXT"
+  # -- the secret must contain `ca.crt`.  If set, `ldap.tlsCaCert` is ignored
+  existingCaSecret: ""
+
+server:
   # -- Key for signing the session cookie, see [Flask documentation](https://flask.palletsprojects.com/en/stable/config/#SECRET_KEY)
   # and a pretty comprehensive [answer](https://stackoverflow.com/questions/22463939/demystify-flask-app-secret-key) on stackoverflow.
   # Usually no need to set it, but if you want to use the same key for multiple pods you can set it here.
@@ -51,31 +66,30 @@ server:
   bruteForceExpiration: 10
   # -- Block after number failures
   bruteForceFailures: 3
+  # -- Enables or disables the [Gunicorn](https://gunicorn.org/) WSGI Server
+  useWsgiServer: true
   # -- Enable automatic reload if certificates where updated
   reloadEnabled: false
-
-ldap:
-  # -- Use an existing secret for the `managerDnUsername` password
+  # -- Enable TLS for the pod. If `useWsgiServer` is `true` you also need the `tlsKey` and `tlsCert`.
+  #  If `useWsgiServer` is `false` you need not to specify `tlsKey` and `tlsCert` and use the on the fly
+  # generated key and certificate
+  tlsEnabled: false
+  # -- Server private key
+  tlsKey: ""
+  # -- the secret must contain tls.key, tls.crt and ca.crt. If set, `tlsKey`, `tlsCert` and `tlsCaCert` are ignored
   existingSecret: ""
-  # -- Cache expiration in minutes
-  cacheExpiration: 15
-  # -- LDAP endpoint
-  endpoint: "ldaps://testmyldap.com:636"
-  # -- Username for LDAP bind requests
-  managerDnUsername: "CN=john,OU=Administrators,DC=TESTMYLDAP,DC=COM"
-  # -- Passwort for `managerDnUsername`, only used when `existingSecret` is not set
-  managerDnPassword:
-  # -- Depends on your LDAP server the binding structure can change.
-  # This field supports variable expansion for the username.
-  bindDN: "{username}@TESTMYLDAP.com"
-  # -- Base in directory tree where the search starts
-  searchBase: "DC=TESTMYLDAP,DC=COM"
-  # -- Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName`
-  searchFilter: "(sAMAccountName={username})"
-  # -- the secret must contain `ca.crt`.  If set, `ldap.tlsCaCert` is ignored
-  existingCaSecret: ""
-  # -- ca certificates for the LDAP connection
+  # -- Server certificate
+  tlsCert: ""
+  # -- Server ca certificates
   tlsCaCert: ""
+  # -- Number of worker processes for the [Gunicorn](https://gunicorn.org/) WSGI Server
+  # Should not be changed, due to caching is done on a per process basis
+  # Only use it in very heavy loaded environments
+  numberOfWorkers: 1
+  # -- Loglevel of the server: `INFO`, `WARNING`, `ERROR`, `DEBUG`
+  logLevel: "INFO"
+  # -- Logformat of the server: `TEXT` or `JSON`
+  logFormat: "TEXT"
 
 serviceAccount:
   # -- Specifies whether a service account should be created
