@@ -1,0 +1,28 @@
+apiVersion: v1
+entries:
+  another-ldap-auth:
+  - apiVersion: v2
+    appVersion: main
+    created: "2025-07-10T09:10:04.130205658Z"
+    description: Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or
+      LDAP based basic-authentication for ingress resources
+    digest: 5229a707f76f8226f00976acc63198e4b488dbfb7260d88e03429418ecf44f03
+    home: https://github.com/scs-zke/another-ldap-auth
+    icon: https://img.shields.io/badge/Chart-another--ldap--auth-informational?style=flat-square
+    keywords:
+    - activedirectory
+    - another-ldap-auth
+    - authentication
+    - basic-auth
+    - http-auth-request
+    - ingress
+    - ldap
+    - nginx
+    name: another-ldap-auth
+    sources:
+    - https://github.com/scs-zke/another-ldap-auth
+    type: application
+    urls:
+    - https://github.com/scs-zke/another-ldap-auth/releases/download/another-ldap-auth-0.0.1/another-ldap-auth-0.0.1.tgz
+    version: 0.0.1
+generated: "2025-07-10T09:10:04.130215156Z"
