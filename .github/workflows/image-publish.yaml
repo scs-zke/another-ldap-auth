@@ -66,22 +66,21 @@ jobs:
       #     subject-digest: ${{ steps.push.outputs.digest }}
       #     push-to-registry: true
 
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build_push.outputs.digest }}
-      #     # image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-      #     format: "sarif"
-      #     output: "trivy-results.sarif"
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build_push.outputs.digest }}
+          format: "sarif"
+          output: "trivy-results.sarif"
 
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: "trivy-results.sarif"
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
 
-      # - name: Make release
-      #   if: startsWith(github.ref, 'refs/tags/v')
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     body: "A Docker image for Helm deployment with https://jgkirschbaum.github.io/another-ldap-auth."
-      #     generateReleaseNotes: true
+      - name: Make release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: ncipollo/release-action@v1
+        with:
+          body: "A Docker image for Helm deployment with https://scs-zke.github.io/another-ldap-auth."
+          generateReleaseNotes: true

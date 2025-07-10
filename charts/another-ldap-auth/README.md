@@ -2,13 +2,13 @@
 
 ![Version: 1.3.7](https://img.shields.io/badge/Version-1.3.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.0](https://img.shields.io/badge/AppVersion-3.6.0-informational?style=flat-square)
 
-Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
+Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
-**Homepage:** <https://github.com/jgkirschbaum/another-ldap-auth>
+**Homepage:** <https://github.com/scs-zke/another-ldap-auth>
 
 ## Source Code
 
-* <https://github.com/jgkirschbaum/another-ldap-auth>
+* <https://github.com/scs-zke/another-ldap-auth>
 
 ## Values
 
@@ -23,7 +23,7 @@ Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP b
 | autoscaling.targetMemoryUtilizationPercentage | string | `""` | When should new replicas be started depending on memory utilization |
 | fullnameOverride | string | `""` | String to fully override rabbitmq.fullname template |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
-| image.repository | string | `"jgkirschbaum/another-ldap-auth"` | Path to the image |
+| image.repository | string | `"ghcr.io/scs-zke/another-ldap-auth"` | Path to the image |
 | image.tag | string | `""` | Image tag to use |
 | imagePullSecrets | list | `[]` | Specify docker-registry secret names as an array |
 | ldap.bindDN | string | `"{username}@TESTMYLDAP.com"` | Depends on your LDAP server the binding structure can change. This field supports variable expansion for the username. |

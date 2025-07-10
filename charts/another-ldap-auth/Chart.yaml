@@ -1,6 +1,6 @@
 apiVersion: v2
 name: another-ldap-auth
-description: Helm chart using docker.io/jgkirschbaum/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
+description: Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 type: application
 version: 1.3.9
 appVersion: 3.6.1
@@ -14,6 +14,6 @@ keywords:
   - ldap
   - nginx
 icon: https://img.shields.io/badge/Chart-another--ldap--auth-informational?style=flat-square
-home: https://github.com/jgkirschbaum/another-ldap-auth
+home: https://github.com/scs-zke/another-ldap-auth
 sources:
-  - https://github.com/jgkirschbaum/another-ldap-auth
+  - https://github.com/scs-zke/another-ldap-auth

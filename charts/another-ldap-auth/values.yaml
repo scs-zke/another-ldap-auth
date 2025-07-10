@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   # -- Path to the image
-  repository: jgkirschbaum/another-ldap-auth
+  repository: ghcr.io/scs-zke/another-ldap-auth
   # -- Image pull policy
   pullPolicy: IfNotPresent
   # -- Image tag to use

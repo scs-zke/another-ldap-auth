@@ -17,7 +17,7 @@ spec:
         app: another-ldap-auth
     spec:
       containers:
-        - image: jgkirschbaum/another-ldap-auth:latest
+        - image: ghcr.io/scs-zke/another-ldap-auth:latest
           imagePullPolicy: Always
           name: another-ldap-auth
           ports:
