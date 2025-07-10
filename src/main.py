@@ -21,28 +21,18 @@ from logs import Logs
 # --- Parameters --------------------------------------------------------------
 if "LDAP_ENDPOINT" in os.environ:
     LDAP_ENDPOINT = os.environ["LDAP_ENDPOINT"]
-else:
-    raise ValueError("LDAP_ENDPOINT must be set")
 
 if "LDAP_MANAGER_DN_USERNAME" in os.environ:
     LDAP_MANAGER_DN_USERNAME = os.environ["LDAP_MANAGER_DN_USERNAME"]
-else:
-    raise ValueError("LDAP_MANAGER_DN_USERNAME must be set")
 
 if "LDAP_MANAGER_PASSWORD" in os.environ:
     LDAP_MANAGER_PASSWORD = os.environ["LDAP_MANAGER_PASSWORD"]
-else:
-    raise ValueError("LDAP_MANAGER_PASSWORD must be set")
 
 if "LDAP_SEARCH_BASE" in os.environ:
     LDAP_SEARCH_BASE = os.environ["LDAP_SEARCH_BASE"]
-else:
-    raise ValueError("LDAP_SEARCH_BASE must be set")
 
 if "LDAP_SEARCH_FILTER" in os.environ:
     LDAP_SEARCH_FILTER = os.environ["LDAP_SEARCH_FILTER"]
-else:
-    raise ValueError("LDAP_SEARCH_FILTER must be set")
 
 # Ldap user attribute specifying the groups the user is a member of
 LDAP_GROUP_MEMBERSHIP_ATTRIBUTE = "memberOf"
