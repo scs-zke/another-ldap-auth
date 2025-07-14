@@ -2,7 +2,7 @@ apiVersion: v2
 name: another-ldap-auth
 description: Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 type: application
-version: 1.0.3
+version: 1.0.4
 appVersion: latest
 keywords:
   - activedirectory
