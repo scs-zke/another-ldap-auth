@@ -83,7 +83,7 @@ All values type are `string`.
 
 ### HTTP request headers
 
-The following HTTP headers can be set to overwrite the LDAP settings defined via environment variables. For them to be activated they have to be specified in the `LDAP_REQUIRED_CONFIG_HEADERS`. To continue using the configuration specified in the environment variables set the headers to an empty string. If the header is listed in `LDAP_REQUIRED_CONFIG_HEADERS` but not defined the auth request the request will be denied.
+The following HTTP headers can be set to overwrite the LDAP settings defined via environment variables. For them to be activated they have to be specified in the `LDAP_REQUIRED_CONFIG_HEADERS`. To continue using the configuration specified in the environment variables set the headers to an empty string. If the header is listed in `LDAP_REQUIRED_CONFIG_HEADERS` but not defined the auth request will be denied.
 
 - `Ldap-Endpoint`
 - `Ldap-Manager-Dn-Username`

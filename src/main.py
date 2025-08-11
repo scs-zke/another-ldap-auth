@@ -454,10 +454,11 @@ def login(username, password):
                 return False
             else:
                 cache.addGroups(username, adGroups)
+        setRegister(username, matchedGroups)
+        return True
 
-    # Success
-    setRegister(username, matchedGroups)
-    return True
+    # Default return false
+    return False
 
 
 # Health-Check URL
