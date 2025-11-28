@@ -1,4 +1,4 @@
-FROM python:3.13.5-alpine3.22 AS builder
+FROM python:3.13.9-alpine3.22 AS builder
 
 RUN apk --update --no-cache add \
         build-base \
@@ -12,7 +12,7 @@ RUN pip install --upgrade --no-cache-dir pip setuptools && \
 
 COPY src/ /app
 
-FROM python:3.13.5-alpine3.22
+FROM python:3.13.9-alpine3.22
 
 RUN apk --update --no-cache add \
         openldap-dev && \
