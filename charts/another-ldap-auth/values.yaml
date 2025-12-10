@@ -123,6 +123,32 @@ service:
   # -- Port of the container to connect
   containerPort: 9000
 
+# -- Liveness probe of pod
+livenessProbe:
+  # -- seconds before performing the first probe
+  initialDelaySeconds: 3
+  # -- interval of probe in seconds
+  periodSeconds: 10
+  # -- probe timeout K8s default is 1s, increase it to cope with heavy load
+  timeoutSeconds: 2
+  # -- numer of sucessful probe executions before the pod is considered ok
+  successThreshold: 1
+  # -- number of failing probe executions before the pod is considered failed
+  failureThreshold: 3
+
+# -- Readiness probe of pod
+readinessProbe:
+  # -- seconds before performing the first probe
+  initialDelaySeconds: 3
+  # -- interval of probe in seconds
+  periodSeconds: 10
+  # -- probe timeout K8s default is 1s, increase it to cope with heavy load
+  timeoutSeconds: 2
+  # -- numer of sucessful probe executions before the pod is considered ok
+  successThreshold: 1
+  # -- number of failing probe executions before the pod is considered failed
+  failureThreshold: 3
+
 # -- Resource requests and limits
 resources: {}
 

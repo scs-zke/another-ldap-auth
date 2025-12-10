@@ -1,6 +1,6 @@
 # another-ldap-auth
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: main](https://img.shields.io/badge/AppVersion-main-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based basic-authentication for ingress resources
 
@@ -43,11 +43,23 @@ Helm chart using ghcr.io/scs-zke/another-ldap-auth to enable AD or LDAP based ba
 | ldap.searchBase | string | `""` | Base in directory tree where the search starts |
 | ldap.searchFilter | string | `"(sAMAccountName={username})"` | Filter for search, for Microsoft Active Directory usually you can use `sAMAccountName` |
 | ldap.tlsCaCert | string | `""` | ca certificates for the LDAP connection |
+| livenessProbe | object | `{"failureThreshold":3,"initialDelaySeconds":3,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":2}` | Liveness probe of pod |
+| livenessProbe.failureThreshold | int | `3` | number of failing probe executions before the pod is considered failed |
+| livenessProbe.initialDelaySeconds | int | `3` | seconds before performing the first probe |
+| livenessProbe.periodSeconds | int | `10` | interval of probe in seconds |
+| livenessProbe.successThreshold | int | `1` | numer of sucessful probe executions before the pod is considered ok |
+| livenessProbe.timeoutSeconds | int | `2` | probe timeout K8s default is 1s, increase it to cope with heavy load |
 | nameOverride | string | `""` | String to partially override rabbitmq.fullname template (will maintain the release name) |
 | nodeSelector | object | `{}` | Special node selector settings |
 | podAnnotations | object | `{}` | Special annotations for the pod |
 | podLabels | object | `{}` | Special labels for the pod |
 | podSecurityContext | object | `{}` | Special security context for the pod |
+| readinessProbe | object | `{"failureThreshold":3,"initialDelaySeconds":3,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":2}` | Readiness probe of pod |
+| readinessProbe.failureThreshold | int | `3` | number of failing probe executions before the pod is considered failed |
+| readinessProbe.initialDelaySeconds | int | `3` | seconds before performing the first probe |
+| readinessProbe.periodSeconds | int | `10` | interval of probe in seconds |
+| readinessProbe.successThreshold | int | `1` | numer of sucessful probe executions before the pod is considered ok |
+| readinessProbe.timeoutSeconds | int | `2` | probe timeout K8s default is 1s, increase it to cope with heavy load |
 | replicaCount | int | `1` | should not be changed, due to caching is done on a per pod basis. Only use it in very heavy loaded environments |
 | resources | object | `{}` | Resource requests and limits |
 | securityContext | object | `{}` | Special security context for the container |

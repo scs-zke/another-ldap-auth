@@ -120,13 +120,21 @@ spec:
               path: /healthz
               port: {{ .Values.service.containerPort }}
               scheme: {{ .Values.server.tlsEnabled | ternary "HTTPS" "HTTP" }}
-            initialDelaySeconds: 3
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /healthz
               port: {{ .Values.service.containerPort }}
               scheme: {{ .Values.server.tlsEnabled | ternary "HTTPS" "HTTP" }}
-            initialDelaySeconds: 3
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           {{- if or .Values.server.tlsEnabled .Values.ldap.tlsCaCert }}
           volumeMounts:
             {{- if .Values.server.tlsEnabled }}
